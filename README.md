@@ -1,4 +1,4 @@
-# Rootella
+# R00tella
 
 :books: Reti Peer To Peer - Università degli Studi di Ferrara :books:
 

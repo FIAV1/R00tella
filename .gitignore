@@ -99,3 +99,14 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# vscode
+.vscode
+
+# pycharm
+.idea
+
+.DS_Store
+
+# pep8
+setup.cfg

@@ -4,30 +4,24 @@ import socket
 import sys
 import os
 import multiprocessing
-from . import handler
-from utils import shell_colors as shell
+from handler.HandlerInterface import HandlerInterface
+from utils import hasher
 
 
 class Server:
 
-	def __init__(self, port: int):
-		self.port = port
+	def __init__(self, port: int, handler: HandlerInterface):
 		self.ss = None
+		self.port = port
 		self.BUFF_SIZE = 200
+		self.handler = handler
 
 	def child(self, sd, clientaddr):
-		(client, client_port) = socket.getnameinfo(clientaddr, socket.NI_NUMERICHOST)
 		self.ss.close()
 
 		request = sd.recv(self.BUFF_SIZE)
-		shell.print_green(f'{client} [{client_port}] -> ', end='')
-		print(f'{request.decode()}', end='')
+		self.handler.serve(request, sd)
 
-		response = handler.serve(sd, request)
-		shell.print_red(' -> ', end='')
-		print(f'{response}')
-
-		sd.close()
 		os._exit(0)
 
 	def __create_socket(self):
@@ -55,9 +49,14 @@ class Server:
 			print(f'Can\'t handle the socket: {OSError}')
 			sys.exit(socket.error)
 
+	def __create_files_dictionary(self):
+		for dir_entry in os.scandir('shared'):
+			file_md5 = hasher.get_md5(dir_entry.path)
+			self.files_dict[file_md5] = {'name': dir_entry.name, 'size': dir_entry.stat().st_size}
+
 	def run(self):
 		self.__create_socket()
-		print(f'Server {self.ss.getsockname()[0]} listening on port {self.ss.getsockname()[1]}...')
+		#print(f'Server {self.ss.getsockname()[0]} listening on port {self.ss.getsockname()[1]}...')
 
 		while True:
 			# Put the passive socket on hold for connection requests

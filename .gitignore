@@ -106,7 +106,9 @@ ENV/
 # pycharm
 .idea
 
-.DS_Store
-
 # pep8
 setup.cfg
+
+.DS_Store
+shared
+downloads

@@ -30,7 +30,7 @@ class MenuHandler:
 		Returns:
 			str - the response
 		"""
-
+		print("Yeah! You chose: " + choice + "\n\n")
 		if choice == "QUER":
 			# codice che manda il pkt sulla socket
 

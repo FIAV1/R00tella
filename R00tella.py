@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from service.Server import Server
-from service.Peer import Peer
 from service.Menu import Menu
 from handler.NeighboursHandler import NeighboursHandler
 from handler.MenuHandler import MenuHandler
@@ -27,4 +26,4 @@ if __name__ == '__main__':
 	p.daemon = True
 	p.start()
 
-	Peer(4000, Menu(MenuHandler())).run()
+	Menu(MenuHandler()).show()

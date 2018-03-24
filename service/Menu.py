@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-from handler.HandlerInterface import HandlerInterface
-import socket
+from handler.MenuHandler import MenuHandler
 
 
 class Menu:
 
-	def __init__(self, handler: HandlerInterface):
+	def __init__(self, handler: MenuHandler):
 		self.handler = handler
 
-	def run(self, sd: socket.socket) -> None:
+	def show(self) -> None:
 
-		print('Hi! I\'ll be a supercool menu, trust me!')
+		while True: # poi la condizione si sistema ovviamente
 
-		choice = input('Select an option: ')
+			print('Hi! I\'ll be a supercool menu, trust me!')
 
-		self.handler.serve(choice, sd)
+			choice = input('Select an option: ')
+
+			self.handler.serve(choice)

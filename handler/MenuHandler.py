@@ -1,27 +1,35 @@
 #!/usr/bin/env python
+
 from handler.SelfHandler import SelfHandler
-from handler.HandlerInterface import HandlerInterface
 from service.Server import Server
 from threading import Timer
 import socket
 from multiprocessing import Process
 
 
-class MenuHandler(HandlerInterface):
+class MenuHandler:
 
 	def __kill_server(self, p: Process):
 		p.terminate()
 
-	def serve(self, request: str, sd: socket.socket) -> None:
+	def __create_socket(self):
+		pass
+
+	def __broadcast(self, request):
+		# qua ci andrà il codice che in un ciclo invia la request ad ogni vicino
+		# appoggiandosi a __create_socket per la creazione della socket necessaria
+		# ad ogni iterazione
+		pass
+
+	def serve(self, choice: str) -> None:
 		""" Handle the peer request
 		Parameters:
 			request - the list containing the request parameters
 		Returns:
 			str - the response
 		"""
-		command = request[:4]
 
-		if command == "QUER":
+		if choice == "QUER":
 			# codice che manda il pkt sulla socket
 
 			# avvio il server di ricezione delle response
@@ -33,18 +41,18 @@ class MenuHandler(HandlerInterface):
 			t = Timer(300, self.__kill_server, args=(p,))
 			t.start()
 
-			input('\nRicerca file in corso, premere invio per continuare...\n')
+			input('\nFile search in progress, press enter to continue...\n')
 
 			if t.isAlive:
 				t.cancel()
 				self.__kill_server(p)
 
-			choice = input('Scegli da chi scaricare:')
+			choice = input('Please select a peer:')
 
-		elif command == "NEAR":
+		elif choice == "NEAR":
 			pass
 
-		elif command == "RETR":
+		elif choice == "RETR":
 
 			if len(request) != 36:
 				return "Invalid request, usage is RETR<Filemd5>"
@@ -57,5 +65,3 @@ class MenuHandler(HandlerInterface):
 
 		else:
 			pass
-
-		sd.close()

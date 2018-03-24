@@ -4,7 +4,7 @@ import socket
 import sys
 import os
 import multiprocessing
-from .HandlerInterface import HandlerInterface
+from handler.HandlerInterface import HandlerInterface
 from utils import hasher
 
 
@@ -13,12 +13,14 @@ class Server:
 	def __init__(self, port: int, handler: HandlerInterface):
 		self.ss = None
 		self.port = port
+		self.BUFF_SIZE = 200
 		self.handler = handler
 
 	def child(self, sd, clientaddr):
 		self.ss.close()
 
-		self.handler.serve(sd)
+		request = sd.recv(self.BUFF_SIZE)
+		self.handler.serve(request, sd)
 
 		os._exit(0)
 
@@ -54,7 +56,7 @@ class Server:
 
 	def run(self):
 		self.__create_socket()
-		print(f'Server {self.ss.getsockname()[0]} listening on port {self.ss.getsockname()[1]}...')
+		#print(f'Server {self.ss.getsockname()[0]} listening on port {self.ss.getsockname()[1]}...')
 
 		while True:
 			# Put the passive socket on hold for connection requests

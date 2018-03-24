@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 from service.Server import Server
-from service.NeighboursHandler import NeighboursHandler
+from service.Peer import Peer
+from service.Menu import Menu
+from handler.NeighboursHandler import NeighboursHandler
+from handler.MenuHandler import MenuHandler
 from utils import shell_colors as shell
 from multiprocessing import Process
 import os
@@ -24,4 +27,4 @@ if __name__ == '__main__':
 	p.daemon = True
 	p.start()
 
-	#input('decommentare per non far morire il processo padre ì, altrimenti muore il figlio, \n \n')
+	Peer(4000, Menu(MenuHandler())).run()

@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 import socket
-from .HandlerInterface import HandlerInterface
+from handler.HandlerInterface import HandlerInterface
 
 
 class SelfHandler(HandlerInterface):
 
-	def serve(self, sd: socket.socket) -> None:
+	def serve(self, request: str, sd: socket.socket) -> None:
 		""" Handle the peer request
 		Parameters:
 			request - the list containing the request parameters
 		Returns:
 			str - the response
 		"""
-		request = sd.recv(self.BUFF_SIZE)
 		command = request[:4]
 
 		if command == "AQUE":

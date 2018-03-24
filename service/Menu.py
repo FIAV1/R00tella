@@ -10,10 +10,13 @@ class Menu:
 
 	def show(self) -> None:
 
-		while True: # poi la condizione si sistema ovviamente
+		choice = ''
+		while choice != 'q':  # poi la condizione si sistema ovviamente
 
 			print('Hi! I\'ll be a supercool menu, trust me!')
 
-			choice = input('Select an option: ')
+			choice = input('Select an option (q to exit): ')
 
 			self.handler.serve(choice)
+
+		print('\nBye!\n')

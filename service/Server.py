@@ -3,7 +3,7 @@
 import socket
 import sys
 import os
-import multiprocessing
+from threading import Thread
 from handler.HandlerInterface import HandlerInterface
 from utils import hasher
 
@@ -17,12 +17,10 @@ class Server:
 		self.handler = handler
 
 	def child(self, sd, clientaddr):
-		self.ss.close()
+		# self.ss.close()
 
-		request = sd.recv(self.BUFF_SIZE)
-		self.handler.serve(request, sd)
-
-		os._exit(0)
+		request = sd.recv(self.BUFF_SIZE).decode()
+		response = self.handler.serve(request, sd)
 
 	def __create_socket(self):
 		try:
@@ -49,10 +47,9 @@ class Server:
 			print(f'Can\'t handle the socket: {OSError}')
 			sys.exit(socket.error)
 
-	def __create_files_dictionary(self):
-		for dir_entry in os.scandir('shared'):
-			file_md5 = hasher.get_md5(dir_entry.path)
-			self.files_dict[file_md5] = {'name': dir_entry.name, 'size': dir_entry.stat().st_size}
+	# def __create_files_dictionary(self):
+	#	for dir_entry in os.scandir('shared'):
+	#		self.files_dict[dir_entry.name] = {'md5': hasher.get_md5(dir_entry.path), 'size': dir_entry.stat().st_size}
 
 	def run(self):
 		self.__create_socket()
@@ -62,8 +59,9 @@ class Server:
 			# Put the passive socket on hold for connection requests
 			(sd, clientaddr) = self.ss.accept()
 
-			p = multiprocessing.Process(target=self.child, args=(sd, clientaddr,))
-			p.daemon = True
-			p.start()
+			t = Thread(target=self.child, args=(sd, clientaddr))
+			t.daemon = True
+			t.start()
 
-			sd.close()
+			# essendo thread non c'è più bisogno di chiudere i fd: sono unici e condivisi
+			# sd.close()

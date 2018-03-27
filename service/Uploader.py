@@ -1,19 +1,27 @@
 #!/usr/bin/env python
 
 import socket
+from service.AppData import AppData
 import os
 import stat
 
 
 class Uploader:
 
-	def __init__(self, sd: socket.socket, fd: int):
+	def __init__(self, sd: socket.socket, file_md5):
 		self.sd = sd
-		self.fd = fd
+		self.file_md5 = file_md5
 
 	def start(self):
-
-		filesize = os.fstat(self.fd)[stat.ST_SIZE]
+		file_name = AppData.get_filename_by_filemd5(self.file_md5)
+		if file_name is None:
+			print('The requested file is not available')
+		try:
+			fd = os.open('shared/' + file_name, os.O_RDONLY)
+			filesize = os.fstat(fd)[stat.ST_SIZE]
+		except OSError as e:
+			print(f'Something went wrong: {e}')
+			raise
 
 		# Calcolo i chunk
 		nchunk = filesize / 4096
@@ -28,7 +36,7 @@ class Uploader:
 		self.sd.send(response.encode())
 
 		for i in range(nchunk):
-			size = '04096'
-			data = os.read(self.fd, 4096)
-			print(f'invio {size} {data}')
-			self.sd.send(size.encode() + data)
+			data = os.read(fd, 4096)
+			readed_size = str(len(data)).zfill(5)
+			print(f'invio {readed_size} {data}')
+			self.sd.send(readed_size.encode() + data)

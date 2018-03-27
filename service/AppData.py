@@ -42,6 +42,12 @@ class AppData:
 	@classmethod
 	def get_shared_filemd5(cls, file: tuple) -> str:
 		return file[1]
+
+	@classmethod
+	def get_filename_by_filemd5(cls, file_md5) -> str:
+		for file in cls.shared_files:
+			if file[0] == file_md5:
+				return file[1]
 	# -----------------------------------------------------------------------------
 
 	# peer list management --------------------------------------------------------

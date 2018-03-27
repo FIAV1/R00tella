@@ -5,7 +5,7 @@ from service.Menu import Menu
 from handler.NeighboursHandler import NeighboursHandler
 from handler.MenuHandler import MenuHandler
 from utils import shell_colors as shell
-from multiprocessing import Process
+from threading import Thread
 import os
 
 
@@ -22,8 +22,8 @@ if __name__ == '__main__':
 	if not os.path.exists('downloads'):
 		os.mkdir('downloads')
 
-	p = Process(target=lambda: Server(3000, NeighboursHandler()).run())
-	p.daemon = True
-	p.start()
+	t = Thread(target=lambda: Server(3000, NeighboursHandler()).run())
+	t.daemon = True
+	t.start()
 
 	Menu(MenuHandler()).show()

@@ -22,6 +22,8 @@ class Server:
 		request = sd.recv(self.BUFF_SIZE).decode()
 		response = self.handler.serve(request, sd)
 
+		return
+
 	def __create_socket(self):
 		try:
 			# Create the socket

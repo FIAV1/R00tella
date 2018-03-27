@@ -59,13 +59,18 @@ class NeighboursHandler(HandlerInterface):
 						AppData.get_shared_filemd5(file) +\
 						AppData.get_shared_filename(file).ljust(100)
 
-				sock, version = self.__create_socket()
-				if version == 4:
-					sock.connect((ip4_peer, port_peer))
-				else:
-					sock.connect((ip6_peer, port_peer))
-				sock.send(response.encode())
-				sock.close()
+				try:
+					sock, version = self.__create_socket()
+					if version == 4:
+						sock.connect((ip4_peer, port_peer))
+					else:
+						sock.connect((ip6_peer, port_peer))
+					sock.send(response.encode())
+					sock.close()
+
+				except socket.error as e:
+					print(f'Something went wrong: {e}')
+
 
 			# forwarding the packet to other peers
 			new_ttl = int(ttl) - 1
@@ -79,13 +84,17 @@ class NeighboursHandler(HandlerInterface):
 				request.replace(ttl, str(new_ttl).zfill(3))
 
 				for peer in recipients:
-					sock, version = self.__create_socket()
-					if version == 4:
-						sock.connect((AppData.get_peer_ip4(peer), AppData.get_peer_port(peer)))
-					else:
-						sock.connect((AppData.get_peer_ip6(peer), AppData.get_peer_port(peer)))
-					sock.send(request.encode())
-					sock.close()
+					try:
+						sock, version = self.__create_socket()
+						if version == 4:
+							sock.connect((AppData.get_peer_ip4(peer), AppData.get_peer_port(peer)))
+						else:
+							sock.connect((AppData.get_peer_ip6(peer), AppData.get_peer_port(peer)))
+						sock.send(request.encode())
+						sock.close()
+
+					except socket.error as e:
+						print(f'Something went wrong: {e}')
 
 		elif command == "NEAR":
 			pass

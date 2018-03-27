@@ -14,7 +14,7 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port)
 	neighbours = list()
 
-	# (ip4_peer, ip6_peer, port_peer, filemd5, filename)
+	# (ipv4, ipv6, port, md5, filename)
 	peer_files = list()
 
 	# received packet management --------------------------------------------------
@@ -49,6 +49,9 @@ class AppData:
 	@classmethod
 	def is_neighbour(cls, peer: tuple) -> bool:
 		return peer in cls.neighbours
+
+	def add_neighbour(cls, peer: tuple) -> None:
+		cls.neighbours.append(peer)
 
 	@classmethod
 	def get_peer_ip4(cls, peer: tuple) -> str:

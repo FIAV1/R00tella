@@ -14,7 +14,7 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port)
 	neighbours = list()
 
-	# (ipv4, ipv6, port, md5, filename)
+	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
 	# received packet management --------------------------------------------------
@@ -66,7 +66,7 @@ class AppData:
 		return peer[2]
 	# -----------------------------------------------------------------------------
 
-	# peer_files management--------------------------------------------------------------
+	# peer_files management--------------------------------------------------------
 	@classmethod
 	def add_peer_files(cls, peer_file: tuple) -> None:
 		cls.peer_files.append(peer_file)
@@ -74,4 +74,16 @@ class AppData:
 	@classmethod
 	def exist_peer_files(cls, peer_file: tuple) -> bool:
 		return peer_file in cls.peer_files
+
+	@classmethod
+	def peer_file_index(cls, peer_file: tuple) -> int:
+		return  cls.peer_files.index(peer_file)
+
+	@classmethod
+	def get_peer_file_by_index(cls, index: int) -> tuple:
+		return cls.peer_files.pop(index)
+
+	@classmethod
+	def clear_peer_files(cls) -> None:
+		cls.peer_files.clear()
 	# -----------------------------------------------------------------------------

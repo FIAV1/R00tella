@@ -26,7 +26,7 @@ class SelfHandler(HandlerInterface):
 			ip4_peer, ip6_peer = ip_utils.get_ip_pair(ip_peer)
 			port_peer = request[75:80]
 			filemd5 = request[80:112]
-			filename = request[112:212].decode('UTF-8').lower().lstrip().rstrip()
+			filename = request[112:212].lower().lstrip().rstrip()
 
 			if not AppData.exist_packet(pktid):
 				AppData.add_packet(pktid, ip_peer, port_peer)
@@ -34,7 +34,9 @@ class SelfHandler(HandlerInterface):
 			if not AppData.exist_peer_files((ip4_peer, ip6_peer, port_peer, filemd5, filename)):
 				AppData.add_peer_files((ip4_peer, ip6_peer, port_peer, filemd5, filename))
 
-			print(f'Response from {ip4_peer}|{ip6_peer} port {port_peer} --> File: {filename} MD5: {filemd5}')
+			index = AppData.peer_file_index((ip4_peer, ip6_peer, port_peer, filemd5, filename))
+
+			print(f'{index})   Response from {ip4_peer}|{ip6_peer} port {port_peer} --> File: {filename} MD5: {filemd5}')
 
 
 		elif command == "ANEA":

@@ -13,7 +13,7 @@ class Uploader:
 		self.file_md5 = file_md5
 
 	def start(self):
-		file_name = AppData.get_filename_by_filemd5(self.file_md5)
+		file_name = AppData.get_filename_by_filemd5_on_shared_files(self.file_md5)
 		if file_name is None:
 			print('The requested file is not available')
 		try:

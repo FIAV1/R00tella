@@ -17,6 +17,7 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
+	file_download: str
 	# received packet management --------------------------------------------------
 	@classmethod
 	def add_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
@@ -86,4 +87,18 @@ class AppData:
 	@classmethod
 	def clear_peer_files(cls) -> None:
 		cls.peer_files.clear()
+	# -----------------------------------------------------------------------------
+
+	# file download management--------------------------------------------------------
+	@classmethod
+	def get_file_download(cls) -> str:
+		return cls.file_download
+
+	@classmethod
+	def set_file_download(cls, filename: str) -> None:
+		cls.file_download = filename
+
+	@classmethod
+	def clear_file_dowload(cls) -> None:
+		cls.file_download = None
 	# -----------------------------------------------------------------------------

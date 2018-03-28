@@ -4,6 +4,7 @@ import socket
 from utils import ip_utils
 from service.AppData import AppData
 from handler.HandlerInterface import HandlerInterface
+from service.Downloader import Downloader
 
 
 class SelfHandler(HandlerInterface):
@@ -57,12 +58,9 @@ class SelfHandler(HandlerInterface):
 			print(f'New neighbour founded: {ip4_peer}|{ip6_peer} port {port_peer}')
 
 		elif command == "ARET":
-			pass
+			if len(request) <= 15:
+				return "Invalid response. Expected: ARET<#chunks>{<chunk_lenght(i)><data(i)>} for i=1,2,...,#chunks"
 
-			#memorizza pacchetto
-
-			#ricevi pacchetto via socket
-
-			#leggi pacchetto
+			Downloader.start(sd, AppData.get_file_download())
 
 		sd.close()

@@ -30,7 +30,7 @@ class SelfHandler(HandlerInterface):
 
 
 			if len(response) != 208:
-				return "Invalid response. Expected: AQUE<pkt_id><ip_peer><port_peer><fileMD5><filename>"
+				return "Invalid response. Expected: AQUE<pkt_id><ip_peer><port_peer><fileMD5><filename>\nFrom the socket:" + command + response
 
 			pktid = response[0:16]
 			ip_peer = response[16:71]
@@ -58,7 +58,7 @@ class SelfHandler(HandlerInterface):
 					print(f'Unable to read the {command} response from the socket\n OSError: {e}')
 
 			if len(response) != 76:
-				return "Invalid response. Expected: ANEA<pkt_id><ip_peer><port_peer>"
+				return "Invalid response. Expected: ANEA<pkt_id><ip_peer><port_peer>\nFrom the socket:" + command + response
 
 			pktid = response[0:16]
 			ip_peer = response[16:71]
@@ -79,5 +79,10 @@ class SelfHandler(HandlerInterface):
 			#	return "Invalid response. Expected: ARET<#chunks>{<chunk_lenght(i)><data(i)>} for i=1,2,...,#chunks"
 
 			Downloader.start(sd, AppData.get_file_download())
+
+		else:
+			wrong_response = sd.recv(300).decode()
+
+			return "Invalid response.\nFrom the socket:" + command + wrong_response
 
 		sd.close()

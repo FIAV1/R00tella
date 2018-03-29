@@ -9,25 +9,35 @@ from service.Downloader import Downloader
 
 class SelfHandler(HandlerInterface):
 
-	def serve(self, request: str, sd: socket.socket) -> None:
+	def serve(self, response: str, sd: socket.socket) -> None:
 		""" Handle the peer request
 		Parameters:
 			request - the list containing the request parameters
 		Returns:
 			str - the response
 		"""
-		command = request[:4]
+		try:
+			command = sd.recv(4).decode()
+		except OSError as e:
+			print(f'Unable to read the command from the socket\n OSError: {e}')
 
 		if command == "AQUE":
-			if len(request) != 212:
+
+			try:
+				response = sd.recv(208).decode()
+			except OSError as e:
+					print(f'Unable to read the {command} response from the socket\n OSError: {e}')
+
+
+			if len(response) != 208:
 				return "Invalid response. Expected: AQUE<pkt_id><ip_peer><port_peer><fileMD5><filename>"
 
-			pktid = request[4:20]
-			ip_peer = request[20:75]
+			pktid = response[0:16]
+			ip_peer = response[16:71]
 			ip4_peer, ip6_peer = ip_utils.get_ip_pair(ip_peer)
-			port_peer = request[75:80]
-			filemd5 = request[80:112]
-			filename = request[112:212].lower().lstrip().rstrip()
+			port_peer = response[71:76]
+			filemd5 = response[76:108]
+			filename = response[108:208].lower().lstrip().rstrip()
 
 			if not AppData.exist_packet(pktid):
 				AppData.add_packet(pktid, ip_peer, port_peer)
@@ -41,13 +51,19 @@ class SelfHandler(HandlerInterface):
 
 
 		elif command == "ANEA":
-			if len(request) != 80:
+
+			try:
+				response = sd.recv(76).decode()
+			except OSError as e:
+					print(f'Unable to read the {command} response from the socket\n OSError: {e}')
+
+			if len(response) != 76:
 				return "Invalid response. Expected: ANEA<pkt_id><ip_peer><port_peer>"
 
-			pktid = request[4:20]
-			ip_peer = request[20:75]
+			pktid = response[0:16]
+			ip_peer = response[16:71]
 			ip4_peer, ip6_peer = ip_utils.get_ip_pair(ip_peer)
-			port_peer = request[75:80]
+			port_peer = response[71:76]
 
 			if not AppData.exist_packet(pktid):
 				AppData.add_packet(pktid, ip_peer, port_peer)
@@ -58,8 +74,9 @@ class SelfHandler(HandlerInterface):
 			print(f'New neighbour founded: {ip4_peer}|{ip6_peer} port {port_peer}')
 
 		elif command == "ARET":
-			if len(request) <= 15:
-				return "Invalid response. Expected: ARET<#chunks>{<chunk_lenght(i)><data(i)>} for i=1,2,...,#chunks"
+
+			#if len(request) <= 15:
+			#	return "Invalid response. Expected: ARET<#chunks>{<chunk_lenght(i)><data(i)>} for i=1,2,...,#chunks"
 
 			Downloader.start(sd, AppData.get_file_download())
 

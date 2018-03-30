@@ -21,13 +21,15 @@ class Downloader:
 			self.sd.close()"""
 
 		total_chunks = int(self.sd.recv(6).decode())
+		print(f'#chunk: {total_chunks}')
 		try:
-			fd = os.open('shared/' + self.file_name, os.O_WRONLY)
+			fd = os.open('shared/' + self.file_name, os.O_WRONLY | os.O_CREAT)
 		except OSError as e:
 			print(f'Something went wrong: {e}')
-			raise
+			raise e
 
 		for i in range(total_chunks):
 			chunk_size = int(self.sd.recv(5).decode())
 			data = self.sd.recv(chunk_size)
 			os.write(fd, data)
+		os.close(fd)

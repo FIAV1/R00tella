@@ -8,21 +8,18 @@ import stat
 
 class Uploader:
 
-	def __init__(self, sd: socket.socket, file_md5):
+	def __init__(self, sd: socket.socket, file_name):
 		self.sd = sd
-		self.file_md5 = file_md5
+		self.file_name = file_name
 
 	def start(self):
-		file_name = AppData.get_filename_by_filemd5_on_shared_files(self.file_md5)
-		if file_name is None:
-			print('The requested file is not available')
+
 		try:
-			fd = os.open('shared/' + file_name, os.O_RDONLY)
+			fd = os.open('shared/' + self.file_name, os.O_RDONLY)
 			filesize = os.fstat(fd)[stat.ST_SIZE]
 		except OSError as e:
 			print(f'Something went wrong: {e}')
-			raise
-
+			raise e
 		# Calcolo i chunk
 		nchunk = filesize / 4096
 		# Verifico se il file si divide esattamente nei chunk
@@ -38,5 +35,7 @@ class Uploader:
 		for i in range(nchunk):
 			data = os.read(fd, 4096)
 			readed_size = str(len(data)).zfill(5)
-			print(f'invio {readed_size} {data}')
+			#print(f'invio {readed_size} {data}')
 			self.sd.send(readed_size.encode() + data)
+		os.close(fd)
+

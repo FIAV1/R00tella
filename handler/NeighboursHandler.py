@@ -6,6 +6,7 @@ from handler.HandlerInterface import HandlerInterface
 from service.AppData import AppData
 from utils import ip_utils
 from threading import Timer
+from service.Uploader import Uploader
 
 
 class NeighboursHandler(HandlerInterface):
@@ -104,11 +105,9 @@ class NeighboursHandler(HandlerInterface):
 			if len(request) != 36:
 				return "Invalid request, usage is RETR<Filemd5>"
 
-			file_md5 = request[5:36].decode()
+			file_md5 = request[4:36].decode()
 
-			test_fd = os.open('shared/screen.png', os.O_RDONLY)
-
-			#Uploader(sd, test_fd).start()
+			Uploader(sd, file_md5).start()
 
 		else:
 			pass

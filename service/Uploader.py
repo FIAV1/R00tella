@@ -1,20 +1,24 @@
 #!/usr/bin/env python
 
 import socket
+from service.AppData import AppData
 import os
 import stat
 
 
 class Uploader:
 
-	def __init__(self, sd: socket.socket, fd: int):
+	def __init__(self, sd: socket.socket, fd):
 		self.sd = sd
 		self.fd = fd
 
 	def start(self):
 
-		filesize = os.fstat(self.fd)[stat.ST_SIZE]
-
+		try:
+			filesize = os.fstat(self.fd)[stat.ST_SIZE]
+		except OSError as e:
+			print(f'Something went wrong: {e}')
+			raise e
 		# Calcolo i chunk
 		nchunk = filesize / 4096
 		# Verifico se il file si divide esattamente nei chunk
@@ -28,7 +32,9 @@ class Uploader:
 		self.sd.send(response.encode())
 
 		for i in range(nchunk):
-			size = '04096'
 			data = os.read(self.fd, 4096)
-			print(f'invio {size} {data}')
-			self.sd.send(size.encode() + data)
+			readed_size = str(len(data)).zfill(5)
+			#print(f'invio {readed_size} {data}')
+			self.sd.send(readed_size.encode() + data)
+		os.close(self.fd)
+

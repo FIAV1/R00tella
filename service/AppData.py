@@ -14,6 +14,7 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port)
 	neighbours = list()
 
+	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
 	# received packet management --------------------------------------------------
@@ -42,6 +43,12 @@ class AppData:
 	@classmethod
 	def get_shared_filemd5(cls, file: tuple) -> str:
 		return file[1]
+
+	@classmethod
+	def get_filename_by_filemd5_on_shared_files(cls, file_md5) -> str:
+		for file in cls.shared_files:
+			if file[1] == file_md5:
+				return file[0]
 	# -----------------------------------------------------------------------------
 
 	# peer list management --------------------------------------------------------

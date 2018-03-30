@@ -9,7 +9,7 @@ class AppData:
 	shared_files = list()
 
 	# {'pktid' : (ip, port)}
-	packets = dict()
+	received_packets = dict()
 
 	# ('ipv4', 'ipv6', 'port)
 	neighbours = list()
@@ -17,14 +17,14 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
-	# received packet management --------------------------------------------------
+	# received packets management --------------------------------------------------
 	@classmethod
-	def add_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
-		cls.packets[pktid] = (ip_peer, port_peer)
+	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
+		cls.received_packets[pktid] = (ip_peer, port_peer)
 
 	@classmethod
-	def exist_packet(cls, pktid: str) -> bool:
-		return pktid in cls.packets
+	def exist_in_received_packets(cls, pktid: str) -> bool:
+		return pktid in cls.received_packets
 	# -----------------------------------------------------------------------------
 
 	# shared files management -----------------------------------------------------
@@ -32,9 +32,15 @@ class AppData:
 	def search_in_shared_files(cls, query_name: str) -> list:
 		results = list()
 		for file in cls.shared_files:
-			if re.search(query_name, file[0]):
+			if re.search(query_name, file[0].lower()):
 				results.append(file)
 		return results
+
+	@classmethod
+	def get_shared_filename_by_filemd5(cls, file_md5: str) -> str:
+		for file in cls.shared_files:
+			if file[1] == file_md5:
+				return file[0]
 
 	@classmethod
 	def get_shared_filename(cls, file: tuple) -> str:
@@ -67,6 +73,13 @@ class AppData:
 	@classmethod
 	def neighbour_index(cls,ip4_peer: str, ip6_peer: str, port_peer: str) -> int:
 		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
+
+	def get_neighbours_recipients(cls, ip_sender: str):
+		recipients = cls.neighbours.copy()
+		for peer in cls.neighbours:
+			if ip_sender in peer[0] or ip_sender in peer[1]:
+				return recipients.remove(peer)
+		return recipients
 
 	@classmethod
 	def get_peer_ip4(cls, peer: tuple) -> str:
@@ -113,4 +126,18 @@ class AppData:
 	@classmethod
 	def clear_peer_files(cls) -> None:
 		cls.peer_files.clear()
+	# -----------------------------------------------------------------------------
+
+	# file download management--------------------------------------------------------
+	@classmethod
+	def get_file_download(cls) -> str:
+		return cls.file_download
+
+	@classmethod
+	def set_file_download(cls, filename: str) -> None:
+		cls.file_download = filename
+
+	@classmethod
+	def clear_file_dowload(cls) -> None:
+		cls.file_download = None
 	# -----------------------------------------------------------------------------

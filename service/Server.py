@@ -17,14 +17,11 @@ class Server:
 
 	def child(self, sd, clientaddr) -> None:
 		""" Serves the incoming requests/responses
-
 		:param sd: socket descriptor
 		:param clientaddr: address of the client
 		:return: None
 		"""
-
-		request = sd.recv(self.BUFF_SIZE).decode()
-		self.handler.serve(request, sd)
+		self.handler.serve(sd)
 
 	def __create_socket(self) -> None:
 		""" Create the passive socket
@@ -72,7 +69,6 @@ class Server:
 
 	def run(self, temporary: bool) -> None:
 		""" Execute the server that listens for incoming requests/repsonses
-
 		:param temporary: indicate wether the server is temporary or not
 		:return: None
 		"""
@@ -95,8 +91,7 @@ class Server:
 					threads.append(t)
 				else:
 					break
-			# essendo thread non c'è più bisogno di chiudere i fd: sono unici e condivisi
-			# sd.close()
+
 			except OSError:
 				if threads is not None:
 					for t in threads:

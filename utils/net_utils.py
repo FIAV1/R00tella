@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 
 import re
+import ipaddress
+
+config = {
+	'ipv4' : '',
+	'ipv6' : '',
+	'neighbours_port' : 3000,
+	'self_port' : 4000
+}
 
 
 def get_ip_pair(ip_string: str) -> tuple:
@@ -20,3 +28,35 @@ def get_ip_pair(ip_string: str) -> tuple:
 	ip_v4 = re.sub('\.[0]*', '.', ip_string[:15])
 	ip_v6 = ip_string[16:]
 	return ip_v4, ip_v6
+
+
+def get_local_ip_for_response():
+	ipv4 = config['ipv4'].split('.')[0].zfill(3)
+	for i in range(1,4):
+		ipv4 = ipv4 + '.' + config['ipv4'].split('.')[i].zfill(3)
+
+	return ipv4 + '|' + ipaddress.IPv6Address(config['ipv6']).exploded
+
+
+def get_local_ipv4():
+	return config['ipv4']
+
+
+def set_local_ipv4(ipv4: str):
+	config['ipv4'] = ipv4
+
+
+def get_local_ipv6():
+	return config['ipv6']
+
+
+def set_local_ipv6(ipv6: str):
+	config['ipv6'] = ipv6
+
+
+def get_neighbours_port():
+	return config['neighbours_port']
+
+
+def get_self_port():
+	return config['self_port']

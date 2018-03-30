@@ -8,15 +8,14 @@ import stat
 
 class Uploader:
 
-	def __init__(self, sd: socket.socket, file_name):
+	def __init__(self, sd: socket.socket, fd):
 		self.sd = sd
-		self.file_name = file_name
+		self.fd = fd
 
 	def start(self):
 
 		try:
-			fd = os.open('shared/' + self.file_name, os.O_RDONLY)
-			filesize = os.fstat(fd)[stat.ST_SIZE]
+			filesize = os.fstat(self.fd)[stat.ST_SIZE]
 		except OSError as e:
 			print(f'Something went wrong: {e}')
 			raise e
@@ -33,9 +32,9 @@ class Uploader:
 		self.sd.send(response.encode())
 
 		for i in range(nchunk):
-			data = os.read(fd, 4096)
+			data = os.read(self.fd, 4096)
 			readed_size = str(len(data)).zfill(5)
 			#print(f'invio {readed_size} {data}')
 			self.sd.send(readed_size.encode() + data)
-		os.close(fd)
+		os.close(self.fd)
 

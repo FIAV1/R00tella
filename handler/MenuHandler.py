@@ -2,28 +2,78 @@
 
 from handler.SelfHandler import SelfHandler
 from service.Server import Server
-from threading import Timer
+from threading import Thread
 import socket
-from multiprocessing import Process
+import uuid
 from service.AppData import AppData
-
+from typing import Optional
 
 
 class MenuHandler:
 
-	def __kill_server(self, p: Process):
-		p.terminate()
+	@staticmethod
+	def __create_socket(host: str, port: str) -> Optional[socket.socket]:
+		""" Handle the peer request
+		Parameters:
+			host - ip address of the host
+			port - port of the host
+		Returns:
+			socket - the active socket
+		"""
+		try:
+			# Create the socket
+			ss = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+		except OSError as e:
+			print(f'\nCan\'t create the socket: {e}\n')
+			return None
 
-	def __create_socket(self):
-		pass
+		try:
+			# Set the SO_REUSEADDR flag in order to tell the kernel to reuse the socket even if it's in a TIME_WAIT state,
+			# without waiting for its natural timeout to expire.
+			# This is because sockets in a TIME_WAIT state can’t be immediately reused.
+			ss.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+			ss.setsockopt(41, socket.IPV6_V6ONLY, 0)
 
-	def __broadcast(self, request):
-		# qua ci andrà il codice che in un ciclo invia la request ad ogni vicino
-		# appoggiandosi a __create_socket per la creazione della socket necessaria
-		# ad ogni iterazione
-		pass
+			ss.connect((host, port))
 
-	def serve(self, choice: str) -> None:
+			return ss
+		except OSError as e:
+			print(f'\nCan\'t handle the socket: {e}\n')
+			return None
+
+	@classmethod
+	def __broadcast(cls, request: str):
+		""" Handle the peer request
+		Parameters:
+			request - the list containing the request parameters
+		"""
+		neighbours = AppData.get_neighbours()
+
+		for neighbour in neighbours:
+			sd = cls.__create_socket(neighbour[0], neighbour[1])
+			if sd is not None:
+				try:
+					sd.sendall(request.encode())
+					sd.close()
+				except socket.error:
+					print(f'Impossible to send data to {neighbour[0]} on port {neighbour[1]}\n')
+			else:
+				print(f'Cannot connect to {neighbour[0]} on port {neighbour[1]}\n')
+
+	@classmethod
+	def __unicast(cls, host: str, port: str, request: str):
+		sd = cls.__create_socket(host, port)
+		if sd is not None:
+			try:
+				sd.sendall(request.encode())
+				sd.close()
+			except socket.error:
+				print(f'Impossible to send data to {host} on port {port}\n')
+		else:
+			print(f'Cannot connect to {host} on port {port}\n')
+
+	@classmethod
+	def serve(cls, choice: str) -> None:
 		""" Handle the peer request
 		Parameters:
 			request - the list containing the request parameters
@@ -31,52 +81,78 @@ class MenuHandler:
 			str - the response
 		"""
 		print("Yeah! You chose: " + choice + "\n\n")
+
 		if choice == "QUER":
+
 			# codice che manda il pkt sulla socket
+			pktid = str(uuid.uuid4().hex[:16].upper())
+			ip = '172.016.001.001|FC00:2001:db8a:a0b2:12f0:a13w:0001:0001'
+			port = '4000'
 
-			# avvio il server di ricezione delle response
-			p = Process(target=lambda: Server(4000, SelfHandler()).run())
-			p.daemon = True
-			p.start()
+			search = input('\nEnter the file name: ')
 
-			# avvio il timer
-			t = Timer(300, self.__kill_server, args=(p,))
+			# aggiungere verifica lunghezza file name
+
+			request = choice+pktid+ip+port+search
+
+			# avvio il server di ricezione delle response, lo faccio prima del broadcast
+			# per evitare che i primi client che rispondono non riescano a connettersi
+			t = Thread(target=lambda: Server(4000, SelfHandler()).run(True))
+			t.daemon = True
 			t.start()
 
-			input('\nFile search in progress, press enter to continue...\n')
+			cls.__broadcast(request)
+			t.join()
 
-			if t.isAlive:
-				t.cancel()
-				self.__kill_server(p)
+			files = AppData.search_in_peer_files(search)
 
-			file_index = input('Please select a file:')
+			for count, file in enumerate(files, start=1):
+				print(f'{count}]', file)
 
-			# INSERIRE IL CODICE DELLA RETR
+			index = input('Please select a file to download:')
+			if files[int(index)][0]:
+				host = files[int(index)][0]
+			else:
+				host = files[int(index)][1]
+			port = files[int(index)][2]
+			file_md5 = files[int(index)][3]
+			file_name = files[int(index)][4]
 
-			# the choice is the number displayed before the print of every the AQUE respose,
-			# the user will use this number to select the file to download
-			peer_file = AppData.get_peer_file_by_index(file_index)
+			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
+			request = 'RETR'+file_md5+file_name
 
-			AppData.set_file_download(peer_file[4])
+			t = Thread(target=lambda: Server(4000, SelfHandler()).run(True))
+			t.daemon = True
+			t.start()
 
-			# After user'choice the peer_file list must be cleaned,
-			# so when the next QUER will send,the list can be repopulated
-			AppData.clear_peer_files()
-			AppData.clear_file_dowload()
+			cls.__unicast(host, port, request)
+
+			t.join()
+
+			print(f'Download of {file_name} completed.')
 
 		elif choice == "NEAR":
-			pass
+			# NEAR[4B].Packet_Id[16B].IP_Peer[55B].Port_Peer[5B].TTL[2B]
+			pktid = str(uuid.uuid4().hex[:16].upper())
+			ip = '172.016.001.001|FC00:2001:db8a:a0b2:12f0:a13w:0001:0001'
+			port = '4000'
+			ttl = 3
 
-		elif choice == "RETR":
+			request = choice + pktid + ip + port + ttl
 
-			if len(request) != 36:
-				return "Invalid request, usage is RETR<Filemd5>"
+			# avvio il server di ricezione delle response, lo faccio prima del broadcast
+			# per evitare che i primi client che rispondono non riescano a connettersi
+			t = Thread(target=lambda: Server(4000, SelfHandler()).run(True))
+			t.daemon = True
+			t.start()
 
-			file_md5 = request[5:36].decode()
+			cls.__broadcast(request)
+			t.join()
 
-			test_fd = os.open('shared/screen.png', os.O_RDONLY)
-
-			#Uploader(sd, test_fd).start()
+			neighbours = AppData.get_neighbours()
+			print(f'Sono stati aggiunti {len(neighbours)} vicini:\n')
+			for count, neighbour in enumerate(neighbours, start=1):
+				print(f'{neighbour}\n')
 
 		else:
 			pass

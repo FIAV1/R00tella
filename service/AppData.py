@@ -57,6 +57,11 @@ class AppData:
 	def is_neighbour(cls, ip4_peer: str, ip6_peer: str,port_peer: str) -> bool:
 		return (ip4_peer,ip6_peer,port_peer) in cls.neighbours
 
+	@classmethod
+	def get_neighbours(cls) -> list:
+		return cls.neighbours
+
+	@classmethod
 	def add_neighbour(cls, ip4_peer: str, ip6_peer: str,port_peer: str) -> None:
 		cls.neighbours.append((ip4_peer, ip6_peer, port_peer))
 

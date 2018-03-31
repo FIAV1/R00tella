@@ -13,10 +13,15 @@ class Menu:
 		choice = ''
 		while choice != 'q':
 
-			choice = input('Select an option (q to exit):\n1] Query\n2] Near\n3] Download\n')
+			choice = input('Select an option (q to exit):\n1] Search a file to download\n2] Search all Peers around you\n')
 
-			if choice in {'1', '2', '3'}:
-				self.handler.serve(choice)
+			if choice in {'1', '2'}:
+				if choice == '1':
+					command = 'QUER'
+				elif choice == '2':
+					command = 'NEAR'
+
+				self.handler.serve(command)
 			elif choice != 'q':
 				print('Input code is wrong. Choose one action!\n\n')
 

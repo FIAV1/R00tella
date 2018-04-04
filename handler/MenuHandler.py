@@ -144,7 +144,7 @@ class MenuHandler:
 			file_name = AppData.get_file_name(files[index])
 
 			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
-			request = 'RETR'+file_md5+file_name
+			request = 'RETR' + file_md5 + file_name
 
 			(sock, port) = self.__unicast(host_ip4, host_ip6, host_port, request)
 			Downloader(sock, file_name).start()

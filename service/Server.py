@@ -52,13 +52,8 @@ class Server:
 			print(f'Can\'t handle the socket: {OSError}')
 			sys.exit(socket.error)
 
-	# def __create_files_dictionary(self):
-	# for dir_entry in os.scandir('shared'):
-	# self.files_dict[dir_entry.name] = {'md5': hasher.get_md5(dir_entry.path), 'size': dir_entry.stat().st_size}
-
 	def __close_socket(self) -> None:
 		""" Close the passive socket ending the accept
-
 		:return: None
 		"""
 		try:

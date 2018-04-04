@@ -6,9 +6,9 @@ import ipaddress
 config = {
 	'ipv4': '',
 	'ipv6': '',
-	'neighbours_port': 3000,
-	'aque_port': 4000,
-	'anea_port': 5000
+	'neighbours_port': '3000',
+	'aque_port': '4000',
+	'anea_port': '5000'
 }
 
 

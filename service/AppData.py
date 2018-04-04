@@ -61,6 +61,10 @@ class AppData:
 		cls.neighbours.append((ip4_peer, ip6_peer, port_peer))
 
 	@classmethod
+	def neighbour_index(cls,ip4_peer: str, ip6_peer: str, port_peer: str) -> int:
+		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
+
+	@classmethod
 	def get_peer_ip4(cls, peer: tuple) -> str:
 		return peer[0]
 

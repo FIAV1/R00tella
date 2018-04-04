@@ -51,7 +51,7 @@ class AppData:
 		return file[1]
 
 	@classmethod
-	def get_filename_by_filemd5_on_shared_files(cls, file_md5) -> str:
+	def get_filename_by_filemd5_on_shared_files(cls, file_md5: str) -> str:
 		for file in cls.shared_files:
 			if file[1] == file_md5:
 				return file[0]
@@ -77,7 +77,7 @@ class AppData:
 	def get_neighbours_recipients(cls, ip_sender: str):
 		recipients = cls.neighbours.copy()
 		for peer in cls.neighbours:
-			if ip_sender in peer[0] or ip_sender in peer[1]:
+			if ip_sender == peer[0] or ip_sender == peer[1]:
 				return recipients.remove(peer)
 		return recipients
 

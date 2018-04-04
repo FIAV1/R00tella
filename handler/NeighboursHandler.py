@@ -67,8 +67,9 @@ class NeighboursHandler(HandlerInterface):
 
 		try:
 			request = sd.recv(200).decode()
-		except OSError as e:
+		except socket.error as e:
 			self.log.write_red(f'Unable to read the request from the socket: {e}')
+			sd.close()
 			return
 
 		# log the request received
@@ -171,6 +172,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			Uploader(sd, fd).start()
+
 		else:
 			self.log.write_red('Invalid request. Unable to reply.')
 			sd.close()

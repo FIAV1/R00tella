@@ -7,8 +7,8 @@ from handler.MenuHandler import MenuHandler
 from utils import shell_colors as shell
 from threading import Thread
 import os
-from utils import net_utils, Logger
-import ipaddress
+from utils import net_utils, Logger, hasher
+from service.AppData import AppData
 
 if __name__ == '__main__':
 
@@ -21,43 +21,10 @@ if __name__ == '__main__':
 	if not os.path.exists('shared'):
 		os.mkdir('shared')
 
-	while True:
-		if net_utils.get_local_ipv4() == '':
-			ip4 = input('Insert your local IPv4 address: ')
-			try:
-				ipaddress.IPv4Address(ip4)
-			except ipaddress.AddressValueError as e:
-				print(f'{ip4} is not a valid IPv4 address, please retry.')
-				continue
-			net_utils.set_local_ipv4(ip4)
-			break
-		else:
-			try:
-				ipaddress.IPv4Address(net_utils.get_local_ipv4())
-				break
-			except ipaddress.AddressValueError as e:
-				ip4 = input(f'{net_utils.get_local_ipv4()} is not a valid IPv4 address, please reinsert it:')
-				net_utils.set_local_ipv4(ip4)
-				continue
+	for dir_entry in os.scandir('shared'):
+		AppData.add_shared_file(dir_entry.name, hasher.get_md5(dir_entry.path), dir_entry.stat().st_size)
 
-	while True:
-		if net_utils.get_local_ipv6() == '':
-			ip6 = input('Insert your local IPv6 address: ')
-			try:
-				ipaddress.IPv6Address(ip6)
-			except ipaddress.AddressValueError as e:
-				print(f'{ip6} is not a valid IPv6 address, please retry.')
-				continue
-			net_utils.set_local_ipv6(ip6)
-			break
-		else:
-			try:
-				ipaddress.IPv6Address(net_utils.get_local_ipv6())
-				break
-			except ipaddress.AddressValueError as e:
-				ip6 = input(f'{net_utils.get_local_ipv6()} is not a valid IPv6 address, please reinsert it:')
-				net_utils.set_local_ipv6(ip6)
-				continue
+	net_utils.prompt_parameters_request()
 
 	log = Logger.Logger('neighbours.log')
 

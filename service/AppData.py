@@ -29,6 +29,10 @@ class AppData:
 
 	# shared files management -----------------------------------------------------
 	@classmethod
+	def add_shared_file(cls, filename: str, file_md5: str, file_size: int) -> None:
+		cls.shared_files.append((filename, file_md5, file_size))
+
+	@classmethod
 	def search_in_shared_files(cls, query_name: str) -> list:
 		results = list()
 		for file in cls.shared_files:
@@ -126,18 +130,4 @@ class AppData:
 	@classmethod
 	def clear_peer_files(cls) -> None:
 		cls.peer_files.clear()
-	# -----------------------------------------------------------------------------
-
-	# file download management--------------------------------------------------------
-	@classmethod
-	def get_file_download(cls) -> str:
-		return cls.file_download
-
-	@classmethod
-	def set_file_download(cls, filename: str) -> None:
-		cls.file_download = filename
-
-	@classmethod
-	def clear_file_dowload(cls) -> None:
-		cls.file_download = None
 	# -----------------------------------------------------------------------------

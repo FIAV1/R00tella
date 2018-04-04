@@ -5,5 +5,5 @@ import socket
 
 class HandlerInterface:
 
-	def serve(self, request: str, sd: socket.socket) -> None:
+	def serve(self, sd: socket.socket) -> None:
 		pass

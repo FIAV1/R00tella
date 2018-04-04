@@ -9,7 +9,7 @@ class AppData:
 	shared_files = list()
 
 	# {'pktid' : (ip, port)}
-	packets = dict()
+	received_packets = dict()
 
 	# ('ipv4', 'ipv6', 'port)
 	neighbours = list()
@@ -17,24 +17,34 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
-	# received packet management --------------------------------------------------
+	# received packets management --------------------------------------------------
 	@classmethod
-	def add_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
-		cls.packets[pktid] = (ip_peer, port_peer)
+	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
+		cls.received_packets[pktid] = (ip_peer, port_peer)
 
 	@classmethod
-	def exist_packet(cls, pktid: str) -> bool:
-		return pktid in cls.packets
+	def exist_in_received_packets(cls, pktid: str) -> bool:
+		return pktid in cls.received_packets
 	# -----------------------------------------------------------------------------
 
 	# shared files management -----------------------------------------------------
 	@classmethod
+	def add_shared_file(cls, filename: str, file_md5: str, file_size: int) -> None:
+		cls.shared_files.append((filename, file_md5, file_size))
+
+	@classmethod
 	def search_in_shared_files(cls, query_name: str) -> list:
 		results = list()
 		for file in cls.shared_files:
-			if re.search(query_name, file[0]):
+			if re.search(query_name, file[0].lower()):
 				results.append(file)
 		return results
+
+	@classmethod
+	def get_shared_filename_by_filemd5(cls, file_md5: str) -> str:
+		for file in cls.shared_files:
+			if file[1] == file_md5:
+				return file[0]
 
 	@classmethod
 	def get_shared_filename(cls, file: tuple) -> str:
@@ -45,7 +55,7 @@ class AppData:
 		return file[1]
 
 	@classmethod
-	def get_filename_by_filemd5_on_shared_files(cls, file_md5) -> str:
+	def get_filename_by_filemd5_on_shared_files(cls, file_md5: str) -> str:
 		for file in cls.shared_files:
 			if file[1] == file_md5:
 				return file[0]
@@ -67,6 +77,13 @@ class AppData:
 	@classmethod
 	def neighbour_index(cls,ip4_peer: str, ip6_peer: str, port_peer: str) -> int:
 		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
+
+	def get_neighbours_recipients(cls, ip_sender: str):
+		recipients = cls.neighbours.copy()
+		for peer in cls.neighbours:
+			if ip_sender == peer[0] or ip_sender == peer[1]:
+				return recipients.remove(peer)
+		return recipients
 
 	@classmethod
 	def get_peer_ip4(cls, peer: tuple) -> str:

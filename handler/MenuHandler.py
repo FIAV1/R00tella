@@ -9,13 +9,13 @@ from service.AppData import AppData
 from typing import Optional
 import random
 from service.Downloader import Downloader
+from utils import net_utils
 
 
 class MenuHandler:
 
 	def __create_socket(self) -> (Optional[socket.socket], Optional[int]):
 		""" Create the active socket
-
 		:return: the active socket
 		"""
 		try:
@@ -34,7 +34,6 @@ class MenuHandler:
 
 	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: str, request: str) -> (Optional[socket.socket], Optional[int]):
 		""" Send the request to the specified host
-
 		:param ip4_peer: host's ipv4 address
 		:param ip6_peer: host's ipv6 address
 		:param port_peer: host's port
@@ -89,8 +88,8 @@ class MenuHandler:
 
 			# codice che manda il pkt sulla socket
 			pktid = str(uuid.uuid4().hex[:16].upper())
-			ip = '172.016.001.001|FC00:2001:db8a:a0b2:12f0:a13w:0001:0001'
-			port = '4000'
+			ip = net_utils.get_local_ip_for_response()
+			port = net_utils.get_aque_port()
 
 			while True:
 				search = input('\nEnter the file name: ')
@@ -155,8 +154,8 @@ class MenuHandler:
 		elif choice == "NEAR":
 			# NEAR[4B].Packet_Id[16B].IP_Peer[55B].Port_Peer[5B].TTL[2B]
 			pktid = str(uuid.uuid4().hex[:16].upper())
-			ip = '172.016.001.001|FC00:2001:db8a:a0b2:12f0:a13w:0001:0001'
-			port = '4001'
+			ip = net_utils.get_local_ip_for_response()
+			port = net_utils.get_anea_port()
 			ttl = '3'
 
 			request = choice + pktid + ip + port + ttl

@@ -17,14 +17,11 @@ class Server:
 
 	def child(self, sd, clientaddr) -> None:
 		""" Serves the incoming requests/responses
-
 		:param sd: socket descriptor
 		:param clientaddr: address of the client
 		:return: None
 		"""
-
-		request = sd.recv(self.BUFF_SIZE).decode()
-		self.handler.serve(request, sd)
+		self.handler.serve(sd)
 
 	def __create_socket(self) -> None:
 		""" Create the passive socket
@@ -55,13 +52,8 @@ class Server:
 			print(f'Can\'t handle the socket: {OSError}')
 			sys.exit(socket.error)
 
-	# def __create_files_dictionary(self):
-	# for dir_entry in os.scandir('shared'):
-	# self.files_dict[dir_entry.name] = {'md5': hasher.get_md5(dir_entry.path), 'size': dir_entry.stat().st_size}
-
 	def __close_socket(self) -> None:
 		""" Close the passive socket ending the accept
-
 		:return: None
 		"""
 		try:
@@ -72,7 +64,6 @@ class Server:
 
 	def run(self, temporary: bool) -> None:
 		""" Execute the server that listens for incoming requests/repsonses
-
 		:param temporary: indicate wether the server is temporary or not
 		:return: None
 		"""
@@ -95,8 +86,7 @@ class Server:
 					threads.append(t)
 				else:
 					break
-			# essendo thread non c'è più bisogno di chiudere i fd: sono unici e condivisi
-			# sd.close()
+
 			except OSError:
 				if threads is not None:
 					for t in threads:

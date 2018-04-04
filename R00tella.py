@@ -7,7 +7,8 @@ from handler.MenuHandler import MenuHandler
 from utils import shell_colors as shell
 from threading import Thread
 import os
-
+from utils import net_utils, Logger, hasher
+from service.AppData import AppData
 
 if __name__ == '__main__':
 
@@ -19,10 +20,15 @@ if __name__ == '__main__':
 
 	if not os.path.exists('shared'):
 		os.mkdir('shared')
-	if not os.path.exists('downloads'):
-		os.mkdir('downloads')
 
-	t = Thread(target=lambda: Server(3000, NeighboursHandler()).run(False))
+	for dir_entry in os.scandir('shared'):
+		AppData.add_shared_file(dir_entry.name, hasher.get_md5(dir_entry.path), dir_entry.stat().st_size)
+
+	net_utils.prompt_parameters_request()
+
+	log = Logger.Logger('neighbours.log')
+
+	t = Thread(target=lambda: Server(net_utils.get_neighbours_port(), NeighboursHandler(log)).run())
 	t.daemon = True
 	t.start()
 

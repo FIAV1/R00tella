@@ -5,6 +5,8 @@ from service.Server import Server
 from threading import Timer
 import socket
 from multiprocessing import Process
+from service.AppData import AppData
+
 
 
 class MenuHandler:
@@ -47,7 +49,20 @@ class MenuHandler:
 				t.cancel()
 				self.__kill_server(p)
 
-			choice = input('Please select a peer:')
+			file_index = input('Please select a file:')
+
+			# INSERIRE IL CODICE DELLA RETR
+
+			# the choice is the number displayed before the print of every the AQUE respose,
+			# the user will use this number to select the file to download
+			peer_file = AppData.get_peer_file_by_index(file_index)
+
+			AppData.set_file_download(peer_file[4])
+
+			# After user'choice the peer_file list must be cleaned,
+			# so when the next QUER will send,the list can be repopulated
+			AppData.clear_peer_files()
+			AppData.clear_file_dowload()
 
 		elif choice == "NEAR":
 			pass

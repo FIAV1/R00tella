@@ -22,7 +22,7 @@ if __name__ == '__main__':
 	if not os.path.exists('downloads'):
 		os.mkdir('downloads')
 
-	t = Thread(target=lambda: Server(3000, NeighboursHandler()).run())
+	t = Thread(target=lambda: Server(3000, NeighboursHandler()).run(False))
 	t.daemon = True
 	t.start()
 

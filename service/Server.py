@@ -2,10 +2,9 @@
 
 import socket
 import sys
-import os
 from threading import Thread
 from handler.HandlerInterface import HandlerInterface
-from utils import hasher
+from threading import Timer
 
 
 class Server:
@@ -16,15 +15,22 @@ class Server:
 		self.BUFF_SIZE = 200
 		self.handler = handler
 
-	def child(self, sd, clientaddr):
-		# self.ss.close()
+	def child(self, sd, clientaddr) -> None:
+		""" Serves the incoming requests/responses
+
+		:param sd: socket descriptor
+		:param clientaddr: address of the client
+		:return: None
+		"""
 
 		request = sd.recv(self.BUFF_SIZE).decode()
-		response = self.handler.serve(request, sd)
+		self.handler.serve(request, sd)
 
-		return
+	def __create_socket(self) -> None:
+		""" Create the passive socket
 
-	def __create_socket(self):
+		:return: None
+		"""
 		try:
 			# Create the socket
 			self.ss = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -50,20 +56,49 @@ class Server:
 			sys.exit(socket.error)
 
 	# def __create_files_dictionary(self):
-	#	for dir_entry in os.scandir('shared'):
-	#		self.files_dict[dir_entry.name] = {'md5': hasher.get_md5(dir_entry.path), 'size': dir_entry.stat().st_size}
+	# for dir_entry in os.scandir('shared'):
+	# self.files_dict[dir_entry.name] = {'md5': hasher.get_md5(dir_entry.path), 'size': dir_entry.stat().st_size}
 
-	def run(self):
+	def __close_socket(self) -> None:
+		""" Close the passive socket ending the accept
+
+		:return: None
+		"""
+		try:
+			self.ss.shutdown(2)
+			self.ss.close()
+		except OSError:
+			self.ss.close()
+
+	def run(self, temporary: bool) -> None:
+		""" Execute the server that listens for incoming requests/repsonses
+
+		:param temporary: indicate wether the server is temporary or not
+		:return: None
+		"""
+		threads = []
 		self.__create_socket()
-		#print(f'Server {self.ss.getsockname()[0]} listening on port {self.ss.getsockname()[1]}...')
+
+		if temporary:
+			timer = Timer(20, self.__close_socket)
+			timer.start()
 
 		while True:
 			# Put the passive socket on hold for connection requests
-			(sd, clientaddr) = self.ss.accept()
+			try:
+				(sd, clientaddr) = self.ss.accept()
 
-			t = Thread(target=self.child, args=(sd, clientaddr))
-			t.daemon = True
-			t.start()
-
+				if not temporary or (temporary and timer.is_alive()):
+					t = Thread(target=self.child, args=(sd, clientaddr))
+					t.daemon = True
+					t.start()
+					threads.append(t)
+				else:
+					break
 			# essendo thread non c'è più bisogno di chiudere i fd: sono unici e condivisi
 			# sd.close()
+			except OSError:
+				if threads is not None:
+					for t in threads:
+						t.join()
+				break

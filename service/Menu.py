@@ -11,12 +11,18 @@ class Menu:
 	def show(self) -> None:
 
 		choice = ''
-		while choice != 'q':  # poi la condizione si sistema ovviamente
+		while choice != 'q':
 
-			print('Hi! I\'ll be a supercool menu, trust me!')
+			choice = input('Select an option (q to exit):\n1] Search a file to download\n2] Search all Peers around you\n')
 
-			choice = input('Select an option (q to exit): ')
+			if choice in {'1', '2'}:
+				if choice == '1':
+					command = 'QUER'
+				elif choice == '2':
+					command = 'NEAR'
 
-			self.handler.serve(choice)
+				self.handler.serve(command)
+			elif choice != 'q':
+				print('Input code is wrong. Choose one action!\n\n')
 
 		print('\nBye!\n')

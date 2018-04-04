@@ -24,7 +24,7 @@ class SelfHandler(HandlerInterface):
 		if command == "AQUE":
 
 			try:
-				response = sd.recv(208).decode()
+				response = sd.recv(250).decode()
 			except OSError as e:
 					print(f'Unable to read the {command} response from the socket\n OSError: {e}')
 
@@ -39,13 +39,10 @@ class SelfHandler(HandlerInterface):
 			filemd5 = response[76:108]
 			filename = response[108:208].lower().lstrip().rstrip()
 
-			if not AppData.exist_packet(pktid):
-				AppData.add_packet(pktid, ip_peer, port_peer)
+			if not AppData.exist_peer_files(ip4_peer, ip6_peer, port_peer, filemd5, filename):
+				AppData.add_peer_files(ip4_peer, ip6_peer, port_peer, filemd5, filename)
 
-			if not AppData.exist_peer_files((ip4_peer, ip6_peer, port_peer, filemd5, filename)):
-				AppData.add_peer_files((ip4_peer, ip6_peer, port_peer, filemd5, filename))
-
-			index = AppData.peer_file_index((ip4_peer, ip6_peer, port_peer, filemd5, filename))
+			index = AppData.peer_file_index(ip4_peer, ip6_peer, port_peer, filemd5, filename)
 
 			print(f'{index})   Response from {ip4_peer}|{ip6_peer} port {port_peer} --> File: {filename} MD5: {filemd5}')
 
@@ -65,20 +62,10 @@ class SelfHandler(HandlerInterface):
 			ip4_peer, ip6_peer = ip_utils.get_ip_pair(ip_peer)
 			port_peer = response[71:76]
 
-			if not AppData.exist_packet(pktid):
-				AppData.add_packet(pktid, ip_peer, port_peer)
+			if not AppData.is_neighbour(ip4_peer, ip6_peer, port_peer):
+				AppData.add_neighbour(ip4_peer, ip6_peer, port_peer)
 
-			if not AppData.is_neighbour((ip4_peer,ip6_peer,port_peer)):
-				AppData.add_neighbour((ip4_peer,ip6_peer,port_peer))
-
-			print(f'New neighbour founded: {ip4_peer}|{ip6_peer} port {port_peer}')
-
-		elif command == "ARET":
-
-			#if len(request) <= 15:
-			#	return "Invalid response. Expected: ARET<#chunks>{<chunk_lenght(i)><data(i)>} for i=1,2,...,#chunks"
-
-			Downloader.start(sd, AppData.get_file_download())
+			print(f'New neighbour found: {ip4_peer}|{ip6_peer} port {port_peer}')
 
 		else:
 			wrong_response = sd.recv(300).decode()

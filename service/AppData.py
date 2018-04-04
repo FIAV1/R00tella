@@ -48,11 +48,11 @@ class AppData:
 
 	# peer list management --------------------------------------------------------
 	@classmethod
-	def is_neighbour(cls, peer: tuple) -> bool:
-		return peer in cls.neighbours
+	def is_neighbour(cls, ip4_peer: str, ip6_peer: str,port_peer: str) -> bool:
+		return (ip4_peer,ip6_peer,port_peer) in cls.neighbours
 
-	def add_neighbour(cls, peer: tuple) -> None:
-		cls.neighbours.append(peer)
+	def add_neighbour(cls, ip4_peer: str, ip6_peer: str,port_peer: str) -> None:
+		cls.neighbours.append((ip4_peer, ip6_peer, port_peer))
 
 	@classmethod
 	def get_peer_ip4(cls, peer: tuple) -> str:
@@ -69,16 +69,16 @@ class AppData:
 
 	# peer_files management--------------------------------------------------------
 	@classmethod
-	def add_peer_files(cls, peer_file: tuple) -> None:
-		cls.peer_files.append(peer_file)
+	def add_peer_files(cls, ip4_peer: str, ip6_peer: str, port_peer: str, filemd5: str, filename: str) -> None:
+		cls.peer_files.append((ip4_peer, ip6_peer, port_peer, filemd5, filename))
 
 	@classmethod
-	def exist_peer_files(cls, peer_file: tuple) -> bool:
-		return peer_file in cls.peer_files
+	def exist_peer_files(cls, ip4_peer: str, ip6_peer: str, port_peer: str, filemd5: str, filename: str) -> bool:
+		return (ip4_peer, ip6_peer, port_peer, filemd5, filename) in cls.peer_files
 
 	@classmethod
-	def peer_file_index(cls, peer_file: tuple) -> int:
-		return  cls.peer_files.index(peer_file)
+	def peer_file_index(cls, ip4_peer: str, ip6_peer: str, port_peer: str, filemd5: str, filename: str) -> int:
+		return cls.peer_files.index((ip4_peer, ip6_peer, port_peer, filemd5, filename))
 
 	@classmethod
 	def get_peer_file_by_index(cls, index: int) -> tuple:

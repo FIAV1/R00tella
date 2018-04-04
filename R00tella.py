@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
 	log = Logger.Logger('neighbours.log')
 
-	t = Thread(target=lambda: Server(net_utils.get_neighbours_port(), NeighboursHandler(log)).run())
+	t = Thread(target=lambda: Server(int(net_utils.get_neighbours_port()), NeighboursHandler(log)).run(False))
 	t.daemon = True
 	t.start()
 

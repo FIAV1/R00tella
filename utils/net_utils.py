@@ -4,8 +4,8 @@ import re
 import ipaddress
 
 config = {
-	'ipv4': '',
-	'ipv6': '',
+	'ipv4': '172.16.1.1',
+	'ipv6': 'fc00::1:1',
 	'neighbours_port': '3000',
 	'aque_port': '4000',
 	'anea_port': '5000'
@@ -83,7 +83,7 @@ def prompt_parameters_request():
 				ipaddress.IPv4Address(get_local_ipv4())
 				break
 			except ipaddress.AddressValueError as e:
-				ip4 = input(f'{net_utils.get_local_ipv4()} is not a valid IPv4 address, please reinsert it:')
+				ip4 = input(f'{get_local_ipv4()} is not a valid IPv4 address, please reinsert it: ')
 				set_local_ipv4(ip4)
 				continue
 
@@ -102,6 +102,6 @@ def prompt_parameters_request():
 				ipaddress.IPv6Address(get_local_ipv6())
 				break
 			except ipaddress.AddressValueError as e:
-				ip6 = input(f'{net_utils.get_local_ipv6()} is not a valid IPv6 address, please reinsert it:')
+				ip6 = input(f'{get_local_ipv6()} is not a valid IPv6 address, please reinsert it: ')
 				set_local_ipv6(ip6)
 				continue

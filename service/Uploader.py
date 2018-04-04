@@ -34,12 +34,6 @@ class Uploader:
 		for i in range(nchunk):
 			data = os.read(self.fd, 4096)
 			readed_size = str(len(data)).zfill(5)
-<<<<<<< HEAD
-			#print(f'invio {readed_size} {data}')
+			# print(f'invio {readed_size} {data}')
 			self.sd.send(readed_size.encode() + data)
 		os.close(self.fd)
-
-=======
-			print(f'invio {readed_size} {data}')
-			self.sd.send(readed_size.encode() + data)
->>>>>>> Implementato il neighbours handler:

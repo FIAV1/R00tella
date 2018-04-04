@@ -94,14 +94,11 @@ class MenuHandler:
 
 			search = input('\nEnter the file name: ')
 
-			# aggiungere verifica lunghezza file name
 			if len(search) <= 0 or len(search) > 20:
 				print('File name must be between 1 and 20 chars long.\n')
 				return
 			elif len(search) < 20:
-				# codice per riempire la search con spazi se necessario
-				zfill = 20 - len(search)
-				search = search + (' ' * zfill)
+				search.ljust(20)
 
 			request = choice+pktid+ip+port+search
 
@@ -132,15 +129,17 @@ class MenuHandler:
 				except ValueError:
 					print('Your choice must be a valid one. Number in range 1 - {len(files} expected\n')
 
-			host = (AppData.get_peer_ip4(files[index]), AppData.get_peer_ip6(files[index]), AppData.get_peer_port(files[index]))
+			host_ip4 = AppData.get_peer_ip4(files[index])
+			host_ip6 = AppData.get_peer_ip6(files[index])
+			host_port = AppData.get_peer_port(files[index])
 			file_md5 = AppData.get_file_md5(files[index])
 			file_name = AppData.get_file_name(files[index])
 
 			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
 			request = 'RETR'+file_md5+file_name
 
-			(sock, port) = self.__unicast(host, request)
-			Downloader.start(sock, port, AppData.get_file_download())
+			(sock, port) = self.__unicast(host_ip4, host_ip6, host_port, request)
+			Downloader(sock, file_name).start()
 
 			print(f'Download of {file_name} completed.')
 

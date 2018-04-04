@@ -66,6 +66,7 @@ class Server:
 		"""
 		try:
 			self.ss.shutdown(2)
+			self.ss.close()
 		except OSError:
 			self.ss.close()
 

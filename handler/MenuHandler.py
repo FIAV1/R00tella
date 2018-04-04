@@ -7,62 +7,91 @@ import socket
 import uuid
 from service.AppData import AppData
 from typing import Optional
+import random
 
 
 class MenuHandler:
 
-	@staticmethod
-	def __create_socket(host: str, port: str) -> Optional[socket.socket]:
-		""" Handle the peer request
-		Parameters:
-			host - ip address of the host
-			port - port of the host
-		Returns:
-			socket - the active socket
+	def __create_socket(self) -> Optional[socket.socket, int]:
+		""" Create the active socket
+
+		:return: the active socket
 		"""
 		try:
 			# Create the socket
-			ss = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+			if random.random() <= 0.5:
+				sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				version = 4
+			else:
+				sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+				version = 6
+
+			return sock, version
 		except OSError as e:
 			print(f'\nCan\'t create the socket: {e}\n')
 			return None
 
+	def __send_packet(self, ip4_peer: str, ip6_peer: str, port_peer: str, packet: str) -> (bool, str, str):
+		""" Send the packet to the specified host
+
+		:param ip4_peer: host's ipv4 address
+		:param ip6_peer: host's ipv6 address
+		:param port_peer: host's port
+		:param packet: packet to be sent
+		:return: bool indicating if the action succeeded or not, and host's ip and port
+		"""
 		try:
-			# Set the SO_REUSEADDR flag in order to tell the kernel to reuse the socket even if it's in a TIME_WAIT state,
-			# without waiting for its natural timeout to expire.
-			# This is because sockets in a TIME_WAIT state can’t be immediately reused.
-			ss.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-			ss.setsockopt(41, socket.IPV6_V6ONLY, 0)
+			sock, version = self.__create_socket()
 
-			ss.connect((host, port))
+			if (sock, version) not in None:
+				if version == 4:
+					sock.connect((ip4_peer, port_peer))
+					# Parametri utili per debug e feedback nel caso di errori di comunicazione
+					ip = ip4_peer
+				else:
+					sock.connect((ip6_peer, port_peer))
+					ip = ip6_peer
+				port = port_peer
 
-			return ss
-		except OSError as e:
-			print(f'\nCan\'t handle the socket: {e}\n')
-			return None
+				sock.send(packet.encode())
+				sock.close()
 
-	@classmethod
-	def __broadcast(cls, request: str):
-		""" Handle the peer request
-		Parameters:
-			request - the list containing the request parameters
+				return True, ip, port
+			else:
+				return False, None, None
+		except socket.error as e:
+			print(f'Error while sending the packet: {e}')
+			return False, None, None
+
+	def __broadcast(self, request: str) -> None:
+		""" Send the request to a pool of hosts
+
+		:param request: the request to send
+		:return: None
 		"""
 		neighbours = AppData.get_neighbours()
 
 		for neighbour in neighbours:
-			sd = cls.__create_socket(neighbour[0], neighbour[1])
-			if sd is not None:
-				try:
-					sd.sendall(request.encode())
-					sd.close()
-				except socket.error:
-					print(f'Impossible to send data to {neighbour[0]} on port {neighbour[1]}\n')
-			else:
-				print(f'Cannot connect to {neighbour[0]} on port {neighbour[1]}\n')
+			(success, ip, port) = self.__send_packet(
+				AppData.get_peer_ip4(neighbour),
+				AppData.get_peer_ip6(neighbour),
+				AppData.get_peer_port(neighbour),
+				request)
+			if not success:
+				print(f'Impossible to send data to {ip} on port {port}\n')
 
-	@classmethod
-	def __unicast(cls, host: str, port: str, request: str):
-		sd = cls.__create_socket(host, port)
+	def __unicast(self, host: tuple, request: str) -> None:
+		""" Send the request to a single host
+
+		:param host: host to send the request to
+		:param request: the request to be sent
+		:return: None
+		"""
+		(success, ip, port) = self.__send_packet(
+			AppData.get_peer_ip4(host),
+			AppData.get_peer_ip6(host),
+			AppData.get_peer_port(host),
+			request)
 		if sd is not None:
 			try:
 				sd.sendall(request.encode())
@@ -72,15 +101,12 @@ class MenuHandler:
 		else:
 			print(f'Cannot connect to {host} on port {port}\n')
 
-	@classmethod
-	def serve(cls, choice: str) -> None:
+	def serve(self, choice: str) -> None:
 		""" Handle the peer request
-		Parameters:
-			request - the list containing the request parameters
-		Returns:
-			str - the response
+
+		:param choice: the choice to handle
+		:return: None
 		"""
-		print("Yeah! You chose: " + choice + "\n\n")
 
 		if choice == "QUER":
 
@@ -101,31 +127,29 @@ class MenuHandler:
 			t.daemon = True
 			t.start()
 
-			cls.__broadcast(request)
+			self.__broadcast(request)
+
+			# grazie alla join possiamo aspettare la fine dell'esecuzione di un thread (il server che riceve tutte le risposte)
 			t.join()
 
-			files = AppData.search_in_peer_files(search)
+			files = AppData.get_peer_files()
 
 			for count, file in enumerate(files, start=1):
 				print(f'{count}]', file)
 
 			index = input('Please select a file to download:')
-			if files[int(index)][0]:
-				host = files[int(index)][0]
-			else:
-				host = files[int(index)][1]
-			port = files[int(index)][2]
+			host = (files[int(index)][0], files[int(index)][1], files[int(index)][2])
 			file_md5 = files[int(index)][3]
 			file_name = files[int(index)][4]
 
 			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
 			request = 'RETR'+file_md5+file_name
 
-			t = Thread(target=lambda: Server(4000, SelfHandler()).run(True))
+			t = Thread(target=lambda: Server(4001, SelfHandler()).run(True))
 			t.daemon = True
 			t.start()
 
-			cls.__unicast(host, port, request)
+			self.__unicast(host, request)
 
 			t.join()
 
@@ -136,17 +160,17 @@ class MenuHandler:
 			pktid = str(uuid.uuid4().hex[:16].upper())
 			ip = '172.016.001.001|FC00:2001:db8a:a0b2:12f0:a13w:0001:0001'
 			port = '4000'
-			ttl = 3
+			ttl = '3'
 
 			request = choice + pktid + ip + port + ttl
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
-			t = Thread(target=lambda: Server(4000, SelfHandler()).run(True))
+			t = Thread(target=lambda: Server(4002, SelfHandler()).run(True))
 			t.daemon = True
 			t.start()
 
-			cls.__broadcast(request)
+			self.__broadcast(request)
 			t.join()
 
 			neighbours = AppData.get_neighbours()

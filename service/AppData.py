@@ -18,6 +18,7 @@ class AppData:
 	peer_files = list()
 
 	file_download: str
+
 	# received packet management --------------------------------------------------
 	@classmethod
 	def add_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
@@ -79,6 +80,9 @@ class AppData:
 	# -----------------------------------------------------------------------------
 
 	# peer_files management--------------------------------------------------------
+	def get_peer_files(cls) -> list:
+		return cls.peer_files
+
 	@classmethod
 	def add_peer_files(cls, ip4_peer: str, ip6_peer: str, port_peer: str, filemd5: str, filename: str) -> None:
 		cls.peer_files.append((ip4_peer, ip6_peer, port_peer, filemd5, filename))

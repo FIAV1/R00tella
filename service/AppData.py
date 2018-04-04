@@ -78,6 +78,7 @@ class AppData:
 	# -----------------------------------------------------------------------------
 
 	# peer_files management--------------------------------------------------------
+	@classmethod
 	def get_peer_files(cls) -> list:
 		return cls.peer_files
 

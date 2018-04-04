@@ -13,7 +13,7 @@ from service.Downloader import Downloader
 
 class MenuHandler:
 
-	def __create_socket(self) -> Optional[socket.socket, int]:
+	def __create_socket(self) -> (Optional[socket.socket], Optional[int]):
 		""" Create the active socket
 
 		:return: the active socket
@@ -32,7 +32,7 @@ class MenuHandler:
 			print(f'\nCan\'t create the socket: {e}\n')
 			return None
 
-	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: str, request: str) -> Optional[socket.socket, int]:
+	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: str, request: str) -> (Optional[socket.socket], Optional[int]):
 		""" Send the request to the specified host
 
 		:param ip4_peer: host's ipv4 address
@@ -92,15 +92,19 @@ class MenuHandler:
 			ip = '172.016.001.001|FC00:2001:db8a:a0b2:12f0:a13w:0001:0001'
 			port = '4000'
 
-			search = input('\nEnter the file name: ')
+			while True:
+				search = input('\nEnter the file name: ')
 
-			if len(search) <= 0 or len(search) > 20:
-				print('File name must be between 1 and 20 chars long.\n')
-				return
-			elif len(search) < 20:
-				search.ljust(20)
+				if len(search) <= 0 or len(search) > 20:
+					print('File name must be between 1 and 20 chars long.\n')
+					return
+				elif len(search) < 20:
+					search.ljust(20)
+					break
+				else:
+					break
 
-			request = choice+pktid+ip+port+search
+			request = choice + pktid + ip + port + search
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
@@ -115,6 +119,10 @@ class MenuHandler:
 
 			files = AppData.get_peer_files()
 
+			if len(files) < 1:
+				print('File not found.\n')
+				return
+
 			for count, file in enumerate(files, start=1):
 				print(f'{count}]', file)
 
@@ -127,7 +135,7 @@ class MenuHandler:
 					else:
 						print(f'Index chosen must be in the correct range: 1 - {len(files)}\n')
 				except ValueError:
-					print('Your choice must be a valid one. Number in range 1 - {len(files} expected\n')
+					print('Your choice must be a valid one: number in range 1 - {len(files} expected\n')
 
 			host_ip4 = AppData.get_peer_ip4(files[index])
 			host_ip6 = AppData.get_peer_ip6(files[index])
@@ -142,6 +150,7 @@ class MenuHandler:
 			Downloader(sock, file_name).start()
 
 			print(f'Download of {file_name} completed.')
+			AppData.clear_peer_files()
 
 		elif choice == "NEAR":
 			# NEAR[4B].Packet_Id[16B].IP_Peer[55B].Port_Peer[5B].TTL[2B]
@@ -160,11 +169,6 @@ class MenuHandler:
 
 			self.__broadcast(request)
 			t.join()
-
-			neighbours = AppData.get_neighbours()
-			print(f'Sono stati aggiunti {len(neighbours)} vicini:\n')
-			for count, neighbour in enumerate(neighbours, start=1):
-				print(f'{neighbour}\n')
 
 		else:
 			pass

@@ -84,6 +84,14 @@ class AppData:
 		return cls.peer_files
 
 	@classmethod
+	def get_file_md5(cls, file: tuple) -> str:
+		return file[3]
+
+	@classmethod
+	def get_file_name(cls, file: tuple) -> str:
+		return file[4]
+
+	@classmethod
 	def add_peer_files(cls, ip4_peer: str, ip6_peer: str, port_peer: str, filemd5: str, filename: str) -> None:
 		cls.peer_files.append((ip4_peer, ip6_peer, port_peer, filemd5, filename))
 

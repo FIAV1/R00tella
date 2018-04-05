@@ -87,7 +87,8 @@ class AppData:
 		recipients = cls.neighbours.copy()
 		for peer in cls.neighbours:
 			if ip_sender == peer[0] or ip_sender == peer[1]:
-				return recipients.remove(peer)
+				recipients.remove(peer)
+				break
 		return recipients
 
 	@classmethod

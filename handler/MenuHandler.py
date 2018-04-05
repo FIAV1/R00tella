@@ -14,53 +14,40 @@ from utils import net_utils
 
 class MenuHandler:
 
-	def __create_socket(self) -> (Optional[socket.socket], Optional[int]):
+	def __create_socket(self) -> (socket.socket, int):
 		""" Create the active socket
-		:return: the active socket
+		:return: the active socket and the version
 		"""
-		try:
-			# Create the socket
-			if random.random() <= 0.5:
-				sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-				version = 4
-			else:
-				sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-				version = 6
+		# Create the socket
+		if random.random() <= 0.5:
+			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			version = 4
+		else:
+			sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+			version = 6
+		return sock, version
 
-			return sock, version
-		except OSError as e:
-			print(f'\nCan\'t create the socket: {e}\n')
-			return None
-
-	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: int, request: str) -> (Optional[socket.socket], Optional[int]):
+	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: int, request: str) -> None:
 		""" Send the request to the specified host
 		:param ip4_peer: host's ipv4 address
 		:param ip6_peer: host's ipv6 address
 		:param port_peer: host's port
 		:param request: packet to be sent
-		:return: the socket and the ip version
+		:return: None
 		"""
 		try:
 			(sock, version) = self.__create_socket()
 
-			if (sock, version) not in None:
-				if version == 4:
-					sock.connect((ip4_peer, port_peer))
-					ip = ip4_peer
-				else:
-					sock.connect((ip6_peer, port_peer))
-					ip = ip6_peer
-				port = port_peer
-
-				sock.send(request.encode())
-				sock.close()
-
-				return sock, version
+			if version == 4:
+				sock.connect((ip4_peer, port_peer))
 			else:
-				return None, None
+				sock.connect((ip6_peer, port_peer))
+
+			sock.send(request.encode())
+			sock.close()
 		except socket.error as e:
-			print(f'Impossible to send data to {ip} on port {port}:\n {e}')
-			return None, None
+			print(f'Impossible to send data to {ip4_peer}|{ip6_peer} on port {port_peer}: {e}')
+			return
 
 	def __broadcast(self, request: str) -> None:
 		""" Send the request to a pool of hosts
@@ -145,8 +132,7 @@ class MenuHandler:
 			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
 			request = 'RETR' + file_md5 + file_name
 
-			(sock, port) = self.__unicast(host_ip4, host_ip6, host_port, request)
-			Downloader(sock, file_name).start()
+			Downloader(host_ip4, host_ip6, host_port, request, file_name).start()
 
 			print(f'Download of {file_name} completed.')
 			AppData.clear_peer_files()

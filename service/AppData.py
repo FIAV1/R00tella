@@ -19,8 +19,12 @@ class AppData:
 
 	# received packets management --------------------------------------------------
 	@classmethod
-	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
+	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: int) -> None:
 		cls.received_packets[pktid] = (ip_peer, port_peer)
+
+	@classmethod
+	def delete_received_packet(cls, pktid: str):
+		del cls.received_packets[pktid]
 
 	@classmethod
 	def exist_in_received_packets(cls, pktid: str) -> bool:
@@ -75,9 +79,10 @@ class AppData:
 		cls.neighbours.append((ip4_peer, ip6_peer, port_peer))
 
 	@classmethod
-	def neighbour_index(cls,ip4_peer: str, ip6_peer: str, port_peer: int) -> int:
+	def neighbour_index(cls, ip4_peer: str, ip6_peer: str, port_peer: int) -> int:
 		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
 
+	@classmethod
 	def get_neighbours_recipients(cls, ip_sender: str):
 		recipients = cls.neighbours.copy()
 		for peer in cls.neighbours:

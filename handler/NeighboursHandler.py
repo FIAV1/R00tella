@@ -8,6 +8,7 @@ from service.Uploader import Uploader
 from utils import net_utils, Logger
 from threading import Timer
 import os
+import ipaddress
 
 
 class NeighboursHandler(HandlerInterface):
@@ -16,8 +17,8 @@ class NeighboursHandler(HandlerInterface):
 		self.log = log
 
 	def __delete_packet(self, pktid: str):
-		if AppData.exist_packet(pktid):
-			del AppData.packets[pktid]
+		if AppData.exist_in_received_packets(pktid):
+			AppData.delete_received_packet(pktid)
 
 	def __create_socket(self):
 		if random.random() <= 0.5:
@@ -36,12 +37,13 @@ class NeighboursHandler(HandlerInterface):
 			# get the recipients list without the peer who sent the packet
 			recipients = AppData.get_neighbours_recipients(ip_sender)
 
+			print(f'forwarding to: {ip_sender}')
 			packet.replace(ttl, str(new_ttl).zfill(3))
 
 			for peer in recipients:
 				self.__send_packet(AppData.get_peer_ip4(peer), AppData.get_peer_ip6(peer), AppData.get_peer_port(peer), packet)
 
-	def __send_packet(self, ip4_peer: str, ip6_peer: str, port_peer: str, packet: str):
+	def __send_packet(self, ip4_peer: str, ip6_peer: str, port_peer: int, packet: str):
 		try:
 			sock, version = self.__create_socket()
 			if version == 4:
@@ -51,12 +53,12 @@ class NeighboursHandler(HandlerInterface):
 			sock.send(packet.encode())
 			sock.close()
 		except socket.error as e:
-			self.log.write_red('Error sending -> ', end='')
+			self.log.write_red(f'Error sending {ip4_peer}|{ip6_peer} [{port_peer}] -> ', end='')
 			self.log.write(f'{packet}')
 			self.log.write_red(f'{e}')
 			return
 
-		self.log.write_blue('Sending -> ', end='')
+		self.log.write_blue(f'Sending {ip4_peer}|{ip6_peer} [{port_peer}] -> ', end='')
 		self.log.write(f'{packet}')
 
 	def serve(self, sd: socket.socket):
@@ -74,6 +76,11 @@ class NeighboursHandler(HandlerInterface):
 
 		# log the request received
 		socket_ip_sender = sd.getpeername()[0]
+		if ipaddress.IPv6Address(socket_ip_sender).ipv4_mapped is None:
+			socket_ip_sender = ipaddress.IPv6Address(socket_ip_sender).compressed
+		else:
+			socket_ip_sender = ipaddress.IPv6Address(socket_ip_sender).ipv4_mapped.compressed
+
 		socket_port_sender = sd.getpeername()[1]
 		self.log.write_green(f'{socket_ip_sender} [{socket_port_sender}] -> ', end='')
 		self.log.write(f'{request}')
@@ -89,7 +96,7 @@ class NeighboursHandler(HandlerInterface):
 			pktid = request[4:20]
 			ip_peer = request[20:75]
 			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_peer)
-			port_peer = request[75:80]
+			port_peer = int(request[75:80])
 			ttl = request[80:82]
 			query = request[82:102].ljust().rjust().lower()
 			sd.close()
@@ -107,7 +114,7 @@ class NeighboursHandler(HandlerInterface):
 
 			for file in results:
 				response = 'AQUE' +\
-						pktid + ip_peer + port_peer +\
+						pktid + ip_peer + str(port_peer) +\
 						AppData.get_shared_filemd5(file) +\
 						AppData.get_shared_filename(file).ljust(100)
 				self.__send_packet(ip4_peer, ip6_peer, port_peer, response)
@@ -124,7 +131,7 @@ class NeighboursHandler(HandlerInterface):
 			pktid = request[4:20]
 			ip_peer = request[20:75]
 			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_peer)
-			port_peer = request[75:80]
+			port_peer = int(request[75:80])
 			ttl = request[80:82]
 			sd.close()
 
@@ -137,7 +144,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			# send the NEAR acknowledge
-			response = 'ANEA' + pktid + net_utils.get_local_ip_for_response() + net_utils.get_neighbours_port()
+			response = 'ANEA' + pktid + net_utils.get_local_ip_for_response() + str(net_utils.get_neighbours_port())
 			self.__send_packet(ip4_peer, ip6_peer, port_peer, response)
 
 			# forwarding the packet to other peers

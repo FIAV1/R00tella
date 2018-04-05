@@ -144,7 +144,7 @@ class MenuHandler:
 			port = net_utils.get_anea_port()
 			ttl = '3'
 
-			request = choice + pktid + ip + str(port) + ttl
+			request = choice + pktid + ip + str(port) + ttl.zfill(3)
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi

@@ -7,6 +7,8 @@ class Logger:
 
 	def __init__(self, filename: str):
 		self.filename = filename
+		log = open(self.filename, 'w')
+		log.close()
 
 	def write(self, string: str, end='\n'):
 		log = open(self.filename, 'at+')
@@ -25,7 +27,7 @@ class Logger:
 
 	def write_green(self, string: str, end='\n'):
 		log = open(self.filename, 'at+')
-		log.write(colors.DEFAULTBG + colors.BOLD + colors.GREEN + string + colors.RESET, end=end)
+		log.write(colors.DEFAULTBG + colors.BOLD + colors.GREEN + string + colors.RESET + end)
 		log.close()
 
 	def write_yellow(self, string: str, end='\n'):

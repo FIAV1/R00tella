@@ -20,7 +20,7 @@ class NeighboursHandler(HandlerInterface):
 		if AppData.exist_in_received_packets(pktid):
 			AppData.delete_received_packet(pktid)
 
-	def __create_socket(self):
+	def __create_socket(self) -> (socket.socket, int):
 		if random.random() <= 0.5:
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			version = 4
@@ -46,10 +46,14 @@ class NeighboursHandler(HandlerInterface):
 	def __send_packet(self, ip4_peer: str, ip6_peer: str, port_peer: int, packet: str):
 		try:
 			sock, version = self.__create_socket()
+			print(f'Socket {sock} creata in versione {version}')
 			if version == 4:
+				print(f'Connetto a {(ip4_peer, port_peer)}')
 				sock.connect((ip4_peer, port_peer))
 			else:
+				print(f'Connetto a {(ip6_peer, port_peer)}')
 				sock.connect((ip6_peer, port_peer))
+			print('Invio pacchetto')
 			sock.send(packet.encode())
 			sock.close()
 		except socket.error as e:

@@ -76,7 +76,8 @@ class MenuHandler:
 			# codice che manda il pkt sulla socket
 			pktid = str(uuid.uuid4().hex[:16].upper())
 			ip = net_utils.get_local_ip_for_response()
-			port = net_utils.get_aque_port()
+			port = net_utils.get_aque_port().zfill(5)
+			ttl = '50'
 
 			while True:
 				search = input('\nEnter the file name: ')
@@ -90,7 +91,7 @@ class MenuHandler:
 				else:
 					break
 
-			request = choice + pktid + ip + str(port) + search
+			request = choice + pktid + ip + str(port) + ttl + search
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
@@ -141,10 +142,10 @@ class MenuHandler:
 			# NEAR[4B].Packet_Id[16B].IP_Peer[55B].Port_Peer[5B].TTL[2B]
 			pktid = str(uuid.uuid4().hex[:16].upper())
 			ip = net_utils.get_local_ip_for_response()
-			port = net_utils.get_anea_port()
-			ttl = '3'
+			port = net_utils.get_anea_port().zfill(5)
+			ttl = '03'
 
-			request = choice + pktid + ip + str(port) + ttl.zfill(3)
+			request = choice + pktid + ip + str(port) + ttl
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi

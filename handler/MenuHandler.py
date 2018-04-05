@@ -120,11 +120,11 @@ class MenuHandler:
 				except ValueError:
 					print('Your choice must be a valid one: number in range 1 - {len(files} expected\n')
 
-			host_ip4 = AppData.get_peer_ip4(files[index])
-			host_ip6 = AppData.get_peer_ip6(files[index])
-			host_port = AppData.get_peer_port(files[index])
-			file_md5 = AppData.get_file_md5(files[index])
-			file_name = AppData.get_file_name(files[index])
+			host_ip4 = AppData.get_file_owner_ip4(files[index-1])
+			host_ip6 = AppData.get_file_owner_ip6(files[index-1])
+			host_port = AppData.get_file_owner_port(files[index-1])
+			file_md5 = AppData.get_file_md5(files[index-1])
+			file_name = AppData.get_file_name(files[index-1])
 
 			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
 			request = 'RETR' + file_md5 + file_name

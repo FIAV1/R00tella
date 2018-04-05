@@ -65,7 +65,7 @@ class AppData:
 				return file[0]
 	# -----------------------------------------------------------------------------
 
-	# peer list management --------------------------------------------------------
+	# neighbours management --------------------------------------------------------
 	@classmethod
 	def is_neighbour(cls, ip4_peer: str, ip6_peer: str, port_peer: int) -> bool:
 		return (ip4_peer, ip6_peer, port_peer) in cls.neighbours
@@ -108,6 +108,18 @@ class AppData:
 	@classmethod
 	def get_peer_files(cls) -> list:
 		return cls.peer_files
+
+	@classmethod
+	def get_file_owner_ip4(cls, file: tuple) -> str:
+		return file[0]
+
+	@classmethod
+	def get_file_owner_ip6(cls, file: tuple) -> str:
+		return file[1]
+
+	@classmethod
+	def get_file_owner_port(cls, file: tuple) -> int:
+		return file[2]
 
 	@classmethod
 	def get_file_md5(cls, file: tuple) -> str:

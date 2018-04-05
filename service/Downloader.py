@@ -63,6 +63,12 @@ class Downloader:
 			print(f'Impossible to send data to {self.host_ip4}|{self.host_ip6} on port {self.host_port}:\n {e}')
 			return
 
+		ack = sock.recv(4).decode()
+		if ack != "ARET":
+			print(f'Invalid command received: {ack}. Expected: ARET')
+			sock.close()
+			return
+
 		total_chunks = int(sock.recv(6).decode())
 		print(f'#chunk: {total_chunks}')
 		try:

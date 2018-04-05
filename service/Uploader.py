@@ -34,6 +34,6 @@ class Uploader:
 		for i in range(nchunk):
 			data = os.read(self.fd, 4096)
 			readed_size = str(len(data)).zfill(5)
-			# print(f'invio {readed_size} {data}')
+			print(f'invio {readed_size} bytes')
 			self.sd.send(readed_size.encode() + data)
 		os.close(self.fd)

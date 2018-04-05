@@ -148,7 +148,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			# send the NEAR acknowledge
-			response = 'ANEA' + pktid + net_utils.get_local_ip_for_response() + str(net_utils.get_neighbours_port())
+			response = 'ANEA' + pktid + net_utils.get_local_ip_for_response() + str(net_utils.get_neighbours_port()).zfill(5)
 			self.__send_packet(ip4_peer, ip6_peer, port_peer, response)
 
 			# forwarding the packet to other peers

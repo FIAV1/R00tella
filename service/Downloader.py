@@ -36,7 +36,7 @@ class Downloader:
 		:param request: packet to be sent
 		:return: sock: the socket which will receive the response
 		"""
-		(sock, version) = self.__create_socket()
+		sock, version = self.__create_socket()
 
 		if version == 4:
 			sock.connect((ip4_peer, port_peer))
@@ -60,7 +60,7 @@ class Downloader:
 		try:
 			sock = self.__send_request(self.host_ip4, self.host_ip6, self.host_port, self.request)
 		except socket.error as e:
-			print(f'Impossible to send data to {ip} on port {port}:\n {e}')
+			print(f'Impossible to send data to {self.host_ip4}|{self.host_ip6} on port {self.host_port}:\n {e}')
 			return
 
 		total_chunks = int(sock.recv(6).decode())

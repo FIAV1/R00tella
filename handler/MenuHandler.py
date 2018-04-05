@@ -82,16 +82,12 @@ class MenuHandler:
 			while True:
 				search = input('\nEnter the file name: ')
 
-				if len(search) <= 0 or len(search) > 20:
+				if not 0 <= len(search) <= 20:
 					print('File name must be between 1 and 20 chars long.\n')
-					return
-				elif len(search) < 20:
-					search.ljust(20)
-					break
-				else:
-					break
+					continue
+				break
 
-			request = choice + pktid + ip + str(port).zfill(5) + ttl + search
+			request = choice + pktid + ip + str(port).zfill(5) + ttl + search.ljust(20)
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi

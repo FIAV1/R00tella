@@ -73,10 +73,8 @@ class SelfHandler(HandlerInterface):
 
 			if not AppData.is_neighbour(ip4_peer, ip6_peer, port_peer):
 				AppData.add_neighbour(ip4_peer, ip6_peer, port_peer)
-
-			index = AppData.neighbour_index(ip4_peer, ip6_peer, port_peer)
-
-			print(f'{index}) New neighbour found: {ip4_peer}|{ip6_peer} port {port_peer}')
+				index = AppData.neighbour_index(ip4_peer, ip6_peer, port_peer)
+				print(f'{index}) New neighbour found: {ip4_peer}|{ip6_peer} port {port_peer}')
 
 		else:
 			wrong_response = sd.recv(300).decode()

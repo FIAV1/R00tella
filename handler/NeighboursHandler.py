@@ -102,7 +102,7 @@ class NeighboursHandler(HandlerInterface):
 			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_peer)
 			port_peer = int(request[75:80])
 			ttl = request[80:82]
-			query = request[82:102].ljust().rjust().lower()
+			query = request[82:102].lstrip().rstrip().lower()
 			sd.close()
 
 			# packet management

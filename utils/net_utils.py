@@ -27,7 +27,7 @@ def get_ip_pair(ip_string: str) -> tuple:
 	-  L’asterisco ci dice “zero o più di quello che mi precede”.
 	Ad esempio la RegEx abc* filtra “ab”, “abc”, “abcc”, e tutto ciò che segue come “abccccccc”.
 	"""
-	ip_v4 = re.sub('\.[0]*', '.', ip_string[:15])
+	ip_v4 = re.sub('\.[0]{1,2}', '.', ip_string[:15])
 	ip_v6 = ipaddress.IPv6Address(ip_string[16:]).compressed
 	return ip_v4, ip_v6
 

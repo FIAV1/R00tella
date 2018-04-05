@@ -37,10 +37,10 @@ class NeighboursHandler(HandlerInterface):
 			# get the recipients list without the peer who sent the packet
 			recipients = AppData.get_neighbours_recipients(ip_sender)
 
-			print(f'forwarding to: {ip_sender}')
 			packet.replace(ttl, str(new_ttl).zfill(3))
 
 			for peer in recipients:
+				print(f'forwarding to: {AppData.get_peer_ip4(peer)}|{AppData.get_peer_ip4(peer)} [{AppData.get_peer_port(peer)}]')
 				self.__send_packet(AppData.get_peer_ip4(peer), AppData.get_peer_ip6(peer), AppData.get_peer_port(peer), packet)
 
 	def __send_packet(self, ip4_peer: str, ip6_peer: str, port_peer: int, packet: str):

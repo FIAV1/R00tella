@@ -10,10 +10,13 @@ class Menu:
 
 	def show(self) -> None:
 
+		print('<1> Search a file to download')
+		print('<2> Search all peers around you')
+
 		choice = ''
 		while choice != 'q':
 
-			choice = input('Select an option (q to exit):\n1] Search a file to download\n2] Search all Peers around you\n')
+			choice = input('Select an option (q to exit):')
 
 			if choice in {'1', '2'}:
 				if choice == '1':
@@ -23,6 +26,6 @@ class Menu:
 
 				self.handler.serve(command)
 			elif choice != 'q':
-				print('Input code is wrong. Choose one action!\n\n')
+				print('Input code is wrong. Choose one action!\n')
 
-		print('\nBye!\n')
+		print('\nBye!')

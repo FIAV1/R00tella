@@ -2,13 +2,14 @@
 
 import re
 import ipaddress
+from service.AppData import AppData
 
 config = {
 	'ipv4': '172.16.1.1',
 	'ipv6': 'fc00::1:1',
-	'neighbours_port': '3000',
-	'aque_port': '4000',
-	'anea_port': '5000'
+	'neighbours_port': 3000,
+	'aque_port': 4000,
+	'anea_port': 5000
 }
 
 
@@ -82,7 +83,7 @@ def prompt_parameters_request():
 			try:
 				ipaddress.IPv4Address(get_local_ipv4())
 				break
-			except ipaddress.AddressValueError as e:
+			except ipaddress.AddressValueError:
 				ip4 = input(f'{get_local_ipv4()} is not a valid IPv4 address, please reinsert it: ')
 				set_local_ipv4(ip4)
 				continue
@@ -92,7 +93,7 @@ def prompt_parameters_request():
 			ip6 = input('Insert your local IPv6 address: ')
 			try:
 				ipaddress.IPv6Address(ip6)
-			except ipaddress.AddressValueError as e:
+			except ipaddress.AddressValueError:
 				print(f'{ip6} is not a valid IPv6 address, please retry.')
 				continue
 			set_local_ipv6(ip6)
@@ -105,3 +106,57 @@ def prompt_parameters_request():
 				ip6 = input(f'{get_local_ipv6()} is not a valid IPv6 address, please reinsert it: ')
 				set_local_ipv6(ip6)
 				continue
+
+
+def prompt_neighbours_request():
+
+	print('You first need to add at least one known peer (q to exit).\n')
+
+	while True:
+
+		while True:
+			ip4 = input('Insert a known peer (IPv4): ')
+			if ip4 == 'q':
+				break
+
+			try:
+				ipaddress.IPv4Address(ip4)
+			except ipaddress.AddressValueError:
+				print(f'{ip4} is not a valid IPv4 address, please retry.')
+				continue
+			break
+
+		if ip4 == 'q':
+			break
+
+		while True:
+			ip6 = input('Insert a known peer (IPv6): ')
+			try:
+				ipaddress.IPv6Address(ip6)
+			except ipaddress.AddressValueError:
+				print(f'{ip6} is not a valid IPv6 address, please retry.')
+				continue
+			break
+
+		if ip6 == 'q':
+			break
+
+		while True:
+			port = input('Insert a known peer (port): ')
+			try:
+				if port == 'q':
+					break
+
+				port = int(port)
+				if not 1024 < port < 65535:
+					print(f'{port} is not a valid port number, please retry.')
+					continue
+			except ValueError:
+				print(f'{port} is not a valid port number, please retry.')
+				continue
+			break
+
+		if port == 'q':
+			break
+
+		AppData.add_neighbour(ip4, ip6, port)

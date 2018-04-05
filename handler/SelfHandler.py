@@ -37,7 +37,7 @@ class SelfHandler(HandlerInterface):
 			pktid = response[0:16]
 			ip_peer = response[16:71]
 			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_peer)
-			port_peer = response[71:76]
+			port_peer = int(response[71:76])
 			filemd5 = response[76:108]
 			filename = response[108:208].lower().lstrip().rstrip()
 
@@ -48,7 +48,7 @@ class SelfHandler(HandlerInterface):
 
 			index = AppData.peer_file_index(ip4_peer, ip6_peer, port_peer, filemd5, filename)
 
-			print(f'{index})   Response from {ip4_peer}|{ip6_peer} port {port_peer} --> File: {filename} MD5: {filemd5}')
+			print(f'{index}) Response from {ip4_peer}|{ip6_peer} port {port_peer} --> File: {filename} MD5: {filemd5}')
 
 		elif command == "ANEA":
 			try:
@@ -67,7 +67,7 @@ class SelfHandler(HandlerInterface):
 			pktid = response[0:16]
 			ip_peer = response[16:71]
 			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_peer)
-			port_peer = response[71:76]
+			port_peer = int(response[71:76])
 
 			# TODO: controllare che il pktid sia coerente con il pktid della nostra NEAR
 
@@ -76,7 +76,7 @@ class SelfHandler(HandlerInterface):
 
 			index = AppData.neighbour_index(ip4_peer, ip6_peer, port_peer)
 
-			print(f'{index})	New neighbour found: {ip4_peer}|{ip6_peer} port {port_peer}')
+			print(f'{index}) New neighbour found: {ip4_peer}|{ip6_peer} port {port_peer}')
 
 		else:
 			wrong_response = sd.recv(300).decode()

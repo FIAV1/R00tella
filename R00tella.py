@@ -26,9 +26,12 @@ if __name__ == '__main__':
 
 	net_utils.prompt_parameters_request()
 
+	while len(AppData.get_neighbours()) == 0:
+		net_utils.prompt_neighbours_request()
+
 	log = Logger.Logger('neighbours.log')
 
-	t = Thread(target=lambda: Server(int(net_utils.get_neighbours_port()), NeighboursHandler(log)).run(False))
+	t = Thread(target=lambda: Server(net_utils.get_neighbours_port(), NeighboursHandler(log)).run(False))
 	t.daemon = True
 	t.start()
 

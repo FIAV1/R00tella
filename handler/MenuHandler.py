@@ -32,7 +32,7 @@ class MenuHandler:
 			print(f'\nCan\'t create the socket: {e}\n')
 			return None
 
-	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: str, request: str) -> (Optional[socket.socket], Optional[int]):
+	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: int, request: str) -> (Optional[socket.socket], Optional[int]):
 		""" Send the request to the specified host
 		:param ip4_peer: host's ipv4 address
 		:param ip6_peer: host's ipv6 address
@@ -103,11 +103,11 @@ class MenuHandler:
 				else:
 					break
 
-			request = choice + pktid + ip + port + search
+			request = choice + pktid + ip + str(port) + search
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
-			t = Thread(target=lambda: Server(int(port), SelfHandler()).run(True))
+			t = Thread(target=lambda: Server(port, SelfHandler()).run(True))
 			t.daemon = True
 			t.start()
 
@@ -158,11 +158,11 @@ class MenuHandler:
 			port = net_utils.get_anea_port()
 			ttl = '3'
 
-			request = choice + pktid + ip + port + ttl
+			request = choice + pktid + ip + str(port) + ttl
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
-			t = Thread(target=lambda: Server(int(port), SelfHandler()).run(True))
+			t = Thread(target=lambda: Server(port, SelfHandler()).run(True))
 			t.daemon = True
 			t.start()
 

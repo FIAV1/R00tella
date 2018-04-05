@@ -113,7 +113,7 @@ class MenuHandler:
 				index = input('Please select a file to download:')
 				try:
 					index = int(index)
-					if 1 <= index < len(files):
+					if 1 <= index <= len(files):
 						break
 					else:
 						print(f'Index chosen must be in the correct range: 1 - {len(files)}\n')

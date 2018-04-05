@@ -163,7 +163,7 @@ class NeighboursHandler(HandlerInterface):
 				sd.close()
 				return
 
-			file_md5 = request[4:36].decode()
+			file_md5 = request[4:36]
 
 			file_name = AppData.get_shared_filename_by_filemd5(file_md5)
 

@@ -175,6 +175,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			try:
+				print(f'Apro {file_name}')
 				fd = os.open('shared/' + file_name, os.O_RDONLY)
 			except OSError as e:
 				self.log.write_blue('Sending -> ', end='')

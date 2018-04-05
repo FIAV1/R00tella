@@ -118,7 +118,7 @@ class NeighboursHandler(HandlerInterface):
 
 			for file in results:
 				response = 'AQUE' +\
-						pktid + ip_peer + str(port_peer) +\
+						pktid + ip_peer + str(port_peer).zfill(5) +\
 						AppData.get_shared_filemd5(file) +\
 						AppData.get_shared_filename(file).ljust(100)
 				self.__send_packet(ip4_peer, ip6_peer, port_peer, response)

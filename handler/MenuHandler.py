@@ -6,7 +6,6 @@ from threading import Thread
 import socket
 import uuid
 from service.AppData import AppData
-from typing import Optional
 import random
 from service.Downloader import Downloader
 from utils import net_utils

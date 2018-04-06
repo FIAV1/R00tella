@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import socket
-from service.AppData import AppData
 import os
 import stat
 

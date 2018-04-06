@@ -159,7 +159,7 @@ class NeighboursHandler(HandlerInterface):
 			if len(request) != 36:
 				self.log.write_blue('Sending -> ', end='')
 				self.log.write('Invalid request. Unable to reply.')
-				sd.send('Invalid request. Unable to reply.')
+				sd.send('Invalid request. Unable to reply.'.encode())
 				sd.close()
 				return
 
@@ -170,17 +170,20 @@ class NeighboursHandler(HandlerInterface):
 			if file_name is None:
 				self.log.write_blue('Sending -> ', end='')
 				self.log.write('Sorry, the requested file is not available anymore by the selected peer.')
-				sd.send('Sorry, the requested file is not available anymore by the selected peer.')
+				sd.send('Sorry, the requested file is not available anymore by the selected peer.'.encode())
 				sd.close()
 				return
 
 			try:
 				print(f'Apro {file_name}')
+				# TODO: check if the file opening is failing ../shared/screen.png needed?
 				fd = os.open('shared/' + file_name, os.O_RDONLY)
 			except OSError as e:
+				# TODO: Viene loggato Cannot open the file to upload: {e} ?? Non ho modo di testare
+				self.log.write_red(f'Cannot open the file to upload: {e}')
 				self.log.write_blue('Sending -> ', end='')
 				self.log.write('Sorry, the peer encountered a problem while serving your request.')
-				sd.send('Sorry, the peer encountered a problem while serving your request.')
+				sd.send('Sorry, the peer encountered a problem while serving your request.'.encode())
 				sd.close()
 				return
 

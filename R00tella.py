@@ -26,13 +26,13 @@ if __name__ == '__main__':
 
 	net_utils.prompt_parameters_request()
 
+	# for testing fast
+	AppData.add_neighbour('192.168.1.78', 'fc00::1:2', 3000)
+
 	while len(AppData.get_neighbours()) == 0:
 		net_utils.prompt_neighbours_request()
 
 	log = Logger.Logger('neighbours.log')
-
-	# for testing fast
-	AppData.add_neighbour('192.168.1.78', 'fc00::1:2', 3000)
 
 	t = Thread(target=lambda: Server(net_utils.get_neighbours_port(), NeighboursHandler(log)).run(False))
 	t.daemon = True

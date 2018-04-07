@@ -81,13 +81,13 @@ class Downloader:
 			chunk_size = sock.recv(5)
 			# if not all the 5 expected bytes has been received
 			while len(chunk_size) < 5:
-				chunk_size += sock.recv(1)
+				chunk_size += sock.recv(chunk_size)
 			chunk_size = int(chunk_size)
 
 			data = sock.recv(chunk_size)
 			# if not all the expected bytes has been received
 			while len(data) < chunk_size:
-				data += sock.recv(1)
+				data += sock.recv(chunk_size)
 			os.write(fd, data)
 			progress_bar.print_progress_bar(i + 1, total_chunks, prefix='Downloading:', suffix='Complete', length=50)
 

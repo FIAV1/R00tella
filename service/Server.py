@@ -82,7 +82,7 @@ class Server:
 				(sd, clientaddr) = self.ss.accept()
 
 				if not temporary or (temporary and timer.is_alive()):
-					t = Thread(target=self.child, args=sd)
+					t = Thread(target=self.child, args=(sd,))
 					t.daemon = True
 					t.start()
 					threads.append(t)

@@ -6,8 +6,8 @@ from service.AppData import AppData
 from utils import shell_colors
 
 config = {
-	'ipv4': '172.16.1.1',
-	'ipv6': 'fcb0::1:1',
+	'ipv4': '',
+	'ipv6': '',
 	'neighbours_port': 3000,
 	'aque_port': 4000,
 	'anea_port': 5000

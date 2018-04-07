@@ -5,8 +5,8 @@ import ipaddress
 from service.AppData import AppData
 
 config = {
-	'ipv4': '',
-	'ipv6': '',
+	'ipv4': '192.168.1.231',
+	'ipv6': 'fc00::1:1',
 	'neighbours_port': 3000,
 	'aque_port': 4000,
 	'anea_port': 5000

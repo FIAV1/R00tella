@@ -176,10 +176,8 @@ class NeighboursHandler(HandlerInterface):
 
 			try:
 				print(f'Apro {file_name}')
-				# TODO: check if the file opening is failing ../shared/screen.png needed?
 				fd = os.open('shared/' + file_name, os.O_RDONLY)
 			except OSError as e:
-				# TODO: Viene loggato Cannot open the file to upload: {e} ?? Non ho modo di testare
 				self.log.write_red(f'Cannot open the file to upload: {e}')
 				self.log.write_blue('Sending -> ', end='')
 				self.log.write('Sorry, the peer encountered a problem while serving your request.')

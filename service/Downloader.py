@@ -72,7 +72,6 @@ class Downloader:
 		total_chunks = int(sock.recv(6).decode())
 		print(f'#chunk: {total_chunks}')
 		try:
-			# TODO: check if the file opening is failing ../shared/screen.png needed?
 			fd = os.open('shared/' + self.file_name, os.O_WRONLY | os.O_CREAT)
 		except OSError as e:
 			print(f'Something went wrong: {e}')

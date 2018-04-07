@@ -84,8 +84,10 @@ class Downloader:
 			while len(chunk_size) < 5:
 				chunk_size += sock.recv(1)
 			print(f'Byte di "chunk_size" ricevuti: {chunk_size}')
+			chunk_size = int(chunk_size)
 
-			data = sock.recv(int(chunk_size))
+			data = sock.recv(chunk_size)
+			# if not all the expected bytes has been received
 			while len(data) < chunk_size:
 				data += sock.recv(1)
 			os.write(fd, data)

@@ -79,7 +79,8 @@ class Downloader:
 			raise e
 
 		for i in range(total_chunks):
-			chunk_size = int(sock.recv(5))
-			data = sock.recv(chunk_size)
+			chunk_size = sock.recv(5)
+			print(f'Byte di "chunk_size" ricevuti: {chunk_size}')
+			data = sock.recv(int(chunk_size))
 			os.write(fd, data)
 		os.close(fd)

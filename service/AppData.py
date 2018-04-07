@@ -4,6 +4,7 @@ import re
 
 
 class AppData:
+	""" Data class containing data structures and methods to interact with them """
 
 	# ('filename', 'md5', 'dim')
 	shared_files = list()
@@ -17,13 +18,16 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
+	# ('QUER', 'pktid', 'ipv4', 'ipv6', 'port', 'ttl', 'research')
+	query = tuple()
+
 	# received packets management --------------------------------------------------
 	@classmethod
 	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: int) -> None:
 		cls.received_packets[pktid] = (ip_peer, port_peer)
 
 	@classmethod
-	def delete_received_packet(cls, pktid: str):
+	def delete_received_packet(cls, pktid: str) -> None:
 		del cls.received_packets[pktid]
 
 	@classmethod
@@ -83,7 +87,7 @@ class AppData:
 		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
 
 	@classmethod
-	def get_neighbours_recipients(cls, ip_sender: str):
+	def get_neighbours_recipients(cls, ip_sender: str) -> list:
 		recipients = cls.neighbours.copy()
 		for peer in cls.neighbours:
 			if ip_sender == peer[0] or ip_sender == peer[1]:
@@ -148,4 +152,22 @@ class AppData:
 	@classmethod
 	def clear_peer_files(cls) -> None:
 		cls.peer_files.clear()
+	# -----------------------------------------------------------------------------
+
+	# query management-------------------------------------------------------------
+	@classmethod
+	def add_query(cls, command: str, pktid: str, info: 'str') -> None:
+		cls.query = (command, pktid, info)
+
+	@classmethod
+	def get_query_command(cls) -> str:
+		return cls.query[0]
+
+	@classmethod
+	def get_query_pktid(cls) -> str:
+		return cls.query[1]
+
+	@classmethod
+	def get_query_info(cls) -> str:
+		return cls.query[2]
 	# -----------------------------------------------------------------------------

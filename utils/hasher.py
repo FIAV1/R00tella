@@ -3,7 +3,7 @@
 import hashlib
 
 
-def get_md5(file_path: str):
+def get_md5(file_path: str) -> None:
 	"""
 	The iter() function has one mandatory argument and one optional argument,
 	and it behaves differently depending on whether one or two arguments are provided.
@@ -19,6 +19,9 @@ def get_md5(file_path: str):
 		• When the iterator’s next()  method is called,
 			the callable passed in as the first argument will be called.
 		• If the value returned from next() is equal to the sentinel, then StopIteration  is raised.
+
+	:param file_path: path of the file to hash
+	:return: None
 	"""
 	m = hashlib.md5()
 	with open(file_path, "rb") as f:

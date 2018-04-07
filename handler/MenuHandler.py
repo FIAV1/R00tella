@@ -9,12 +9,14 @@ from service.AppData import AppData
 import random
 from service.Downloader import Downloader
 from utils import net_utils
+from utils import shell_colors
 
 
 class MenuHandler:
 
 	def __create_socket(self) -> (socket.socket, int):
 		""" Create the active socket
+
 		:return: the active socket and the version
 		"""
 		# Create the socket
@@ -26,12 +28,13 @@ class MenuHandler:
 			version = 6
 		return sock, version
 
-	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: int, request: str) -> None:
-		""" Send the request to the specified host
+	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: int, packet: str) -> None:
+		""" Send the packet to the specified host
+
 		:param ip4_peer: host's ipv4 address
 		:param ip6_peer: host's ipv6 address
 		:param port_peer: host's port
-		:param request: packet to be sent
+		:param packet: packet to be sent
 		:return: None
 		"""
 		try:
@@ -42,16 +45,16 @@ class MenuHandler:
 			else:
 				sock.connect((ip6_peer, port_peer))
 
-			sock.send(request.encode())
+			sock.send(packet.encode())
 			sock.close()
 		except socket.error as e:
-			print(f'Impossible to send data to {ip4_peer}|{ip6_peer} on port {port_peer}: {e}')
+			shell_colors.print_red(f'\nImpossible to send data to {ip4_peer}|{ip6_peer} [{port_peer}]: {e}\n')
 			return
 
-	def __broadcast(self, request: str) -> None:
-		""" Send the request to a pool of hosts
+	def __broadcast(self, packet: str) -> None:
+		""" Send the packet to a pool of hosts
 
-		:param request: the request to send
+		:param packet: packet to be sent
 		:return: None
 		"""
 		neighbours = AppData.get_neighbours()
@@ -61,10 +64,10 @@ class MenuHandler:
 				AppData.get_peer_ip4(neighbour),
 				AppData.get_peer_ip6(neighbour),
 				AppData.get_peer_port(neighbour),
-				request)
+				packet)
 
 	def serve(self, choice: str) -> None:
-		""" Handle the peer request
+		""" Handle the peer packet
 
 		:param choice: the choice to handle
 		:return: None
@@ -82,11 +85,12 @@ class MenuHandler:
 				search = input('\nEnter the file name: ')
 
 				if not 0 <= len(search) <= 20:
-					print('File name must be between 1 and 20 chars long.\n')
+					shell_colors.print_red('\nFile name must be between 1 and 20 chars long.\n')
 					continue
 				break
 
-			request = choice + pktid + ip + str(port).zfill(5) + ttl + search.ljust(20)
+			packet = choice + pktid + ip + str(port).zfill(5) + ttl + search.ljust(20)
+			AppData.add_query(choice, pktid, '')
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
@@ -94,7 +98,7 @@ class MenuHandler:
 			t.daemon = True
 			t.start()
 
-			self.__broadcast(request)
+			self.__broadcast(packet)
 
 			# grazie alla join possiamo aspettare la fine dell'esecuzione di un thread (il server che riceve tutte le risposte)
 			t.join()
@@ -102,22 +106,23 @@ class MenuHandler:
 			files = AppData.get_peer_files()
 
 			if len(files) < 1:
-				print('File not found.\n')
+				shell_colors.print_yellow('\nFile not found.\n')
 				return
 
+			shell_colors.print_green(f'\n{len(files)} files found:')
 			for count, file in enumerate(files, start=1):
 				print(f'{count}]', file)
 
 			while True:
-				index = input('Please select a file to download:')
+				index = input('\nPlease select a file to download:')
 				try:
 					index = int(index)
 					if 1 <= index <= len(files):
 						break
 					else:
-						print(f'Index chosen must be in the correct range: 1 - {len(files)}\n')
+						shell_colors.print_red(f'Index chosen must be in the correct range: 1 - {len(files)}.\n')
 				except ValueError:
-					print('Your choice must be a valid one: number in range 1 - {len(files} expected\n')
+					shell_colors.print_red(f'Your choice must be a valid one: number in range 1 - {len(files)} expected.\n')
 
 			host_ip4 = AppData.get_file_owner_ip4(files[index-1])
 			host_ip6 = AppData.get_file_owner_ip6(files[index-1])
@@ -125,13 +130,16 @@ class MenuHandler:
 			file_md5 = AppData.get_file_md5(files[index-1])
 			file_name = AppData.get_file_name(files[index-1])
 
-			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
-			request = 'RETR' + file_md5
+			# preparo packet per retr, faccio partire server in attesa download, invio packet e attendo
+			packet = 'RETR' + file_md5
 
-			Downloader(host_ip4, host_ip6, host_port, request, file_name).start()
+			try:
+				Downloader(host_ip4, host_ip6, host_port, packet, file_name).start()
 
-			print(f'Download of {file_name} completed.')
-			AppData.clear_peer_files()
+				shell_colors.print_green(f'\nDownload of {file_name} completed.\n')
+				AppData.clear_peer_files()
+			except Exception:
+				shell_colors.print_red(f'\nError while downloading {file_name}\n')
 
 		elif choice == "NEAR":
 			# NEAR[4B].Packet_Id[16B].IP_Peer[55B].Port_Peer[5B].TTL[2B]
@@ -140,7 +148,8 @@ class MenuHandler:
 			port = net_utils.get_anea_port()
 			ttl = '03'
 
-			request = choice + pktid + ip + str(port).zfill(5) + ttl
+			packet = choice + pktid + ip + str(port).zfill(5) + ttl
+			AppData.add_query(choice, pktid, '')
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
@@ -148,7 +157,7 @@ class MenuHandler:
 			t.daemon = True
 			t.start()
 
-			self.__broadcast(request)
+			self.__broadcast(packet)
 			t.join()
 
 		else:

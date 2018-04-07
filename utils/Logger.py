@@ -4,6 +4,7 @@ from utils import shell_colors as colors
 
 
 class Logger:
+	""" Utils class used to write into a logger with colors (useful for debug purposes) """
 
 	def __init__(self, filename: str):
 		self.filename = filename

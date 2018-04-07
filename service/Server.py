@@ -74,6 +74,8 @@ class Server:
 			timer = Timer(20, self.__close_socket)
 			timer.start()
 
+		print(f'Server listening on port {self.port}')
+
 		while True:
 			# Put the passive socket on hold for connection requests
 			try:

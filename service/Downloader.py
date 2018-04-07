@@ -36,7 +36,7 @@ class Downloader:
 		:param request: packet to be sent
 		:return: sock: the socket which will receive the response
 		"""
-		(sock, version) = self.__create_socket()
+		sock, version = self.__create_socket()
 
 		if version == 4:
 			sock.connect((ip4_peer, port_peer))
@@ -60,7 +60,13 @@ class Downloader:
 		try:
 			sock = self.__send_request(self.host_ip4, self.host_ip6, self.host_port, self.request)
 		except socket.error as e:
-			print(f'Impossible to send data to {ip} on port {port}:\n {e}')
+			print(f'Impossible to send data to {self.host_ip4}|{self.host_ip6} on port {self.host_port}:\n {e}')
+			return
+
+		ack = sock.recv(4).decode()
+		if ack != "ARET":
+			print(f'Invalid command received: {ack}. Expected: ARET')
+			sock.close()
 			return
 
 		total_chunks = int(sock.recv(6).decode())
@@ -72,7 +78,16 @@ class Downloader:
 			raise e
 
 		for i in range(total_chunks):
-			chunk_size = int(sock.recv(5).decode())
+			chunk_size = sock.recv(5)
+			# if not all the 5 expected bytes has been received
+			while len(chunk_size) < 5:
+				chunk_size += sock.recv(1)
+			print(f'Byte di "chunk_size" ricevuti: {chunk_size}')
+			chunk_size = int(chunk_size)
+
 			data = sock.recv(chunk_size)
+			# if not all the expected bytes has been received
+			while len(data) < chunk_size:
+				data += sock.recv(1)
 			os.write(fd, data)
 		os.close(fd)

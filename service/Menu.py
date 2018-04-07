@@ -10,12 +10,10 @@ class Menu:
 
 	def show(self) -> None:
 
-		print('<1> Search a file to download')
-		print('<2> Search all peers around you')
-
 		choice = ''
 		while choice != 'q':
-
+			print('<1> Search a file to download')
+			print('<2> Search all peers around you')
 			choice = input('Select an option (q to exit):')
 
 			if choice in {'1', '2'}:

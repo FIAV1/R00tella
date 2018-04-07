@@ -19,8 +19,12 @@ class AppData:
 
 	# received packets management --------------------------------------------------
 	@classmethod
-	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: str) -> None:
+	def add_received_packet(cls, pktid: str, ip_peer: str, port_peer: int) -> None:
 		cls.received_packets[pktid] = (ip_peer, port_peer)
+
+	@classmethod
+	def delete_received_packet(cls, pktid: str):
+		del cls.received_packets[pktid]
 
 	@classmethod
 	def exist_in_received_packets(cls, pktid: str) -> bool:
@@ -61,7 +65,7 @@ class AppData:
 				return file[0]
 	# -----------------------------------------------------------------------------
 
-	# peer list management --------------------------------------------------------
+	# neighbours management --------------------------------------------------------
 	@classmethod
 	def is_neighbour(cls, ip4_peer: str, ip6_peer: str, port_peer: int) -> bool:
 		return (ip4_peer, ip6_peer, port_peer) in cls.neighbours
@@ -75,14 +79,16 @@ class AppData:
 		cls.neighbours.append((ip4_peer, ip6_peer, port_peer))
 
 	@classmethod
-	def neighbour_index(cls,ip4_peer: str, ip6_peer: str, port_peer: int) -> int:
+	def neighbour_index(cls, ip4_peer: str, ip6_peer: str, port_peer: int) -> int:
 		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
 
+	@classmethod
 	def get_neighbours_recipients(cls, ip_sender: str):
 		recipients = cls.neighbours.copy()
 		for peer in cls.neighbours:
 			if ip_sender == peer[0] or ip_sender == peer[1]:
-				return recipients.remove(peer)
+				recipients.remove(peer)
+				break
 		return recipients
 
 	@classmethod
@@ -102,6 +108,18 @@ class AppData:
 	@classmethod
 	def get_peer_files(cls) -> list:
 		return cls.peer_files
+
+	@classmethod
+	def get_file_owner_ip4(cls, file: tuple) -> str:
+		return file[0]
+
+	@classmethod
+	def get_file_owner_ip6(cls, file: tuple) -> str:
+		return file[1]
+
+	@classmethod
+	def get_file_owner_port(cls, file: tuple) -> int:
+		return file[2]
 
 	@classmethod
 	def get_file_md5(cls, file: tuple) -> str:

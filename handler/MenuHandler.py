@@ -6,7 +6,6 @@ from threading import Thread
 import socket
 import uuid
 from service.AppData import AppData
-from typing import Optional
 import random
 from service.Downloader import Downloader
 from utils import net_utils
@@ -77,20 +76,17 @@ class MenuHandler:
 			pktid = str(uuid.uuid4().hex[:16].upper())
 			ip = net_utils.get_local_ip_for_response()
 			port = net_utils.get_aque_port()
+			ttl = '50'
 
 			while True:
 				search = input('\nEnter the file name: ')
 
-				if len(search) <= 0 or len(search) > 20:
+				if not 0 <= len(search) <= 20:
 					print('File name must be between 1 and 20 chars long.\n')
-					return
-				elif len(search) < 20:
-					search.ljust(20)
-					break
-				else:
-					break
+					continue
+				break
 
-			request = choice + pktid + ip + str(port) + search
+			request = choice + pktid + ip + str(port).zfill(5) + ttl + search.ljust(20)
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
@@ -116,21 +112,21 @@ class MenuHandler:
 				index = input('Please select a file to download:')
 				try:
 					index = int(index)
-					if 1 <= index < len(files):
+					if 1 <= index <= len(files):
 						break
 					else:
 						print(f'Index chosen must be in the correct range: 1 - {len(files)}\n')
 				except ValueError:
 					print('Your choice must be a valid one: number in range 1 - {len(files} expected\n')
 
-			host_ip4 = AppData.get_peer_ip4(files[index])
-			host_ip6 = AppData.get_peer_ip6(files[index])
-			host_port = AppData.get_peer_port(files[index])
-			file_md5 = AppData.get_file_md5(files[index])
-			file_name = AppData.get_file_name(files[index])
+			host_ip4 = AppData.get_file_owner_ip4(files[index-1])
+			host_ip6 = AppData.get_file_owner_ip6(files[index-1])
+			host_port = AppData.get_file_owner_port(files[index-1])
+			file_md5 = AppData.get_file_md5(files[index-1])
+			file_name = AppData.get_file_name(files[index-1])
 
 			# preparo request per retr, faccio partire server in attesa download, invio request e attendo
-			request = 'RETR' + file_md5 + file_name
+			request = 'RETR' + file_md5
 
 			Downloader(host_ip4, host_ip6, host_port, request, file_name).start()
 
@@ -142,9 +138,9 @@ class MenuHandler:
 			pktid = str(uuid.uuid4().hex[:16].upper())
 			ip = net_utils.get_local_ip_for_response()
 			port = net_utils.get_anea_port()
-			ttl = '3'
+			ttl = '03'
 
-			request = choice + pktid + ip + str(port) + ttl
+			request = choice + pktid + ip + str(port).zfill(5) + ttl
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi

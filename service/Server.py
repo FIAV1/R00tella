@@ -5,6 +5,7 @@ import sys
 from threading import Thread
 from handler.HandlerInterface import HandlerInterface
 from threading import Timer
+from utils import shell_colors
 
 
 class Server:
@@ -15,10 +16,9 @@ class Server:
 		self.BUFF_SIZE = 200
 		self.handler = handler
 
-	def child(self, sd, clientaddr) -> None:
+	def child(self, sd) -> None:
 		""" Serves the incoming requests/responses
 		:param sd: socket descriptor
-		:param clientaddr: address of the client
 		:return: None
 		"""
 		self.handler.serve(sd)
@@ -32,7 +32,7 @@ class Server:
 			# Create the socket
 			self.ss = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 		except OSError as e:
-			print(f'Can\'t create the socket: {e}')
+			shell_colors.print_red(f'\nCan\'t create the socket: {e}\n')
 			sys.exit(socket.error)
 
 		try:
@@ -49,11 +49,12 @@ class Server:
 			# define a queue of SOMAXCONN possible connection requests
 			self.ss.listen(socket.SOMAXCONN)
 		except OSError:
-			print(f'Can\'t handle the socket: {OSError}')
+			shell_colors.print_red(f'\nCan\'t handle the socket: {OSError}\n')
 			sys.exit(socket.error)
 
 	def __close_socket(self) -> None:
 		""" Close the passive socket ending the accept
+
 		:return: None
 		"""
 		try:
@@ -64,6 +65,7 @@ class Server:
 
 	def run(self, temporary: bool) -> None:
 		""" Execute the server that listens for incoming requests/repsonses
+
 		:param temporary: indicate wether the server is temporary or not
 		:return: None
 		"""
@@ -74,15 +76,13 @@ class Server:
 			timer = Timer(20, self.__close_socket)
 			timer.start()
 
-		print(f'Server listening on port {self.port}')
-
 		while True:
 			# Put the passive socket on hold for connection requests
 			try:
 				(sd, clientaddr) = self.ss.accept()
 
 				if not temporary or (temporary and timer.is_alive()):
-					t = Thread(target=self.child, args=(sd, clientaddr))
+					t = Thread(target=self.child, args=(sd,))
 					t.daemon = True
 					t.start()
 					threads.append(t)

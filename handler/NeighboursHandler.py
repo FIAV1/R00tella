@@ -56,7 +56,6 @@ class NeighboursHandler(HandlerInterface):
 			packet.replace(ttl, str(new_ttl).zfill(3))
 
 			for peer in recipients:
-				self.log.write_green(f'forwarding to: {AppData.get_peer_ip4(peer)}|{AppData.get_peer_ip4(peer)} [{AppData.get_peer_port(peer)}]')
 				self.__unicast(AppData.get_peer_ip4(peer), AppData.get_peer_ip6(peer), AppData.get_peer_port(peer), packet)
 
 	def __unicast(self, ip4_peer: str, ip6_peer: str, port_peer: int, packet: str) -> None:

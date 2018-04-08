@@ -3,7 +3,7 @@
 import hashlib
 
 
-def get_md5(file_path: str) -> None:
+def get_md5(file_path: str) -> str:
 	"""
 	The iter() function has one mandatory argument and one optional argument,
 	and it behaves differently depending on whether one or two arguments are provided.

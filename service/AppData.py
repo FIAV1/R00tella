@@ -156,7 +156,7 @@ class AppData:
 
 	# query management-------------------------------------------------------------
 	@classmethod
-	def add_query(cls, command: str, pktid: str, info: 'str') -> None:
+	def add_query(cls, command: str, pktid: str, info: str) -> None:
 		cls.query = (command, pktid, info)
 
 	@classmethod

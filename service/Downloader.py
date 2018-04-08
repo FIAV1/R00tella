@@ -5,16 +5,18 @@ import os
 import random
 from utils import shell_colors
 from utils import progress_bar
+from service.AppData import AppData
 
 
 class Downloader:
 
-	def __init__(self, host_ip4: str, host_ip6: str, host_port: int, packet: str, file_name: str):
+	def __init__(self, host_ip4: str, host_ip6: str, host_port: int, packet: str, file_name: str, file_md5: str):
 		self.host_ip4 = host_ip4
 		self.host_ip6 = host_ip6
 		self.host_port = host_port
 		self.packet = packet
 		self.file_name = file_name
+		self.file_md5 = file_md5
 
 	def __create_socket(self) -> (socket.socket, int):
 		""" Create the active socket
@@ -81,7 +83,7 @@ class Downloader:
 			chunk_size = sock.recv(5)
 			# if not all the 5 expected bytes has been received
 			while len(chunk_size) < 5:
-				chunk_size += sock.recv(chunk_size)
+				chunk_size += sock.recv(5)
 			chunk_size = int(chunk_size)
 
 			data = sock.recv(chunk_size)
@@ -92,3 +94,6 @@ class Downloader:
 			progress_bar.print_progress_bar(i + 1, total_chunks, prefix='Downloading:', suffix='Complete', length=50)
 
 		os.close(fd)
+
+		# Adding the new file to data structure to make it available to others
+		AppData.add_shared_file(self.file_name, self.file_md5, os.stat('shared/' + self.file_name).st_size)

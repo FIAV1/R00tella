@@ -134,7 +134,7 @@ class MenuHandler:
 			packet = 'RETR' + file_md5
 
 			try:
-				Downloader(host_ip4, host_ip6, host_port, packet, file_name).start()
+				Downloader(host_ip4, host_ip6, host_port, packet, file_name, file_md5).start()
 
 				shell_colors.print_green(f'\nDownload of {file_name} completed.\n')
 				AppData.clear_peer_files()

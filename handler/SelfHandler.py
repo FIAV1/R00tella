@@ -44,7 +44,6 @@ class SelfHandler(HandlerInterface):
 			filename = response[108:208].lower().lstrip().rstrip()
 
 			if pktid != AppData.get_query_pktid():
-				shell_colors.print_red('\nThe packet received has a wrong packet id: aborting...\n')
 				sd.close()
 				return
 
@@ -71,7 +70,6 @@ class SelfHandler(HandlerInterface):
 			port_peer = int(response[71:76])
 
 			if pktid != AppData.get_query_pktid():
-				shell_colors.print_red('\nThe packet received has a wrong packet id: aborting...\n')
 				sd.close()
 				return
 

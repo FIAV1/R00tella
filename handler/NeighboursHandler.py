@@ -53,7 +53,7 @@ class NeighboursHandler(HandlerInterface):
 			# get the recipients list without the peer who sent the packet
 			recipients = AppData.get_neighbours_recipients(ip_sender)
 
-			packet = packet.replace(ttl, str(new_ttl).zfill(3))
+			packet = packet.replace(ttl, str(new_ttl).zfill(2))
 
 			for peer in recipients:
 				self.__unicast(AppData.get_peer_ip4(peer), AppData.get_peer_ip6(peer), AppData.get_peer_port(peer), packet)

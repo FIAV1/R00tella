@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-from service.Server import Server
+from service.ServerThread import ServerThread
 from service.Menu import Menu
 from handler.NeighboursHandler import NeighboursHandler
 from handler.MenuHandler import MenuHandler
 from utils import shell_colors as shell
-from threading import Thread
 import os
 from utils import net_utils, Logger, hasher
 from service.AppData import AppData
@@ -26,10 +25,15 @@ if __name__ == '__main__':
 
 	net_utils.prompt_parameters_request()
 
+	while len(AppData.get_neighbours()) == 0:
+		shell.print_blue(
+			'\nThis process will allow you to add a known peer to your list of known peers.\n')
+		net_utils.prompt_neighbours_request()
+
 	log = Logger.Logger('neighbours.log')
 
-	t = Thread(target=lambda: Server(net_utils.get_neighbours_port(), NeighboursHandler(log)).run(False))
-	t.daemon = True
-	t.start()
+	server = ServerThread(net_utils.get_neighbours_port(), NeighboursHandler(log))
+	server.daemon = True
+	server.start()
 
 	Menu(MenuHandler()).show()

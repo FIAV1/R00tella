@@ -106,6 +106,10 @@ class AppData:
 	@classmethod
 	def get_peer_port(cls, peer: tuple) -> int:
 		return peer[2]
+
+	@classmethod
+	def remove_neighbour(cls, neighbour_index: int) -> None:
+		cls.neighbours.pop(neighbour_index)
 	# -----------------------------------------------------------------------------
 
 	# peer_files management--------------------------------------------------------

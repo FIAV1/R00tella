@@ -14,7 +14,8 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
 		:return: None
 	"""
 
-	percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+	# Calc the percentage to show
+	percent = round(100.0 * (iteration / float(total)), 1)
 
 	# Calc the amount of bar to be filled
 	filled_length = int(length * iteration // total)
@@ -23,7 +24,7 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
 	bar = fill * filled_length + '-' * (length - filled_length)
 
 	# Prints the loading bar
-	shell_colors.print_blue('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
+	shell_colors.print_blue(f'\r{prefix} |{bar}| {percent}% {suffix}', end='\r')
 
 	# Print new line on complete
 	if iteration == total:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from handler.MenuHandler import MenuHandler
-from utils.net_utils import prompt_neighbours_request
+from utils import net_utils
 from utils import shell_colors
 from service.AppData import AppData
 
@@ -19,26 +19,31 @@ class Menu:
 
 		choice = ''
 		while choice != 'q':
-			shell_colors.print_orange('\n-----------------------------------')
-			shell_colors.print_orange('| <1> Search a file to download   |')
-			shell_colors.print_orange('| <2> Search all peers around you |')
-			shell_colors.print_orange('| <3> Add peers manually          |')
-			shell_colors.print_orange('-----------------------------------')
-			shell_colors.print_orange('Select an option (q to exit):')
-			choice = input()
+			print('\n- Main Menù -----------------------')
+			print('| <1> Search a file to download   |')
+			print('| <2> Search all peers around you |')
+			print('| <3> List peers                  |')
+			print('| <4> Add a peer                  |')
+			print('| <5> Remove a peer               |')
+			print('-----------------------------------')
+			choice = input('Select an option (q to exit): ')
 
-			if choice in {'1', '2'}:
+			if choice in {'1', '2', '3', '4', '5'}:
 				if len(AppData.get_neighbours()) == 0:
-					shell_colors.print_red('\n! You need to have at least one peer to get started !')
-					continue
+					shell_colors.print_red('\n! You need to have at least one peer to get started !\n')
+					command = 'ADDPEER'
 				elif choice == '1':
 					command = 'QUER'
 				elif choice == '2':
 					command = 'NEAR'
+				elif choice == '3':
+					command = 'LISTPEERS'
+				elif choice == '4':
+					command = 'ADDPEER'
+				elif choice == '5':
+					command = 'REMOVEPEER'
 
 				self.handler.serve(command)
-			elif choice == '3':
-				prompt_neighbours_request()
 			elif choice != 'q':
 				shell_colors.print_red('Input code is wrong. Choose one action!\n')
 

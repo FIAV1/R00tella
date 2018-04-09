@@ -18,8 +18,8 @@ class AppData:
 	# ('ipv4', 'ipv6', 'port', 'md5', 'filename')
 	peer_files = list()
 
-	# ('QUER', 'pktid', 'ipv4', 'ipv6', 'port', 'ttl', 'research')
-	query = tuple()
+	# 'pktid'
+	sent_packet = str()
 
 	# received packets management --------------------------------------------------
 	@classmethod
@@ -160,18 +160,10 @@ class AppData:
 
 	# query management-------------------------------------------------------------
 	@classmethod
-	def add_query(cls, command: str, pktid: str, info: str) -> None:
-		cls.query = (command, pktid, info)
+	def set_sent_packet(cls, pktid: str) -> None:
+		cls.sent_packet = pktid
 
 	@classmethod
-	def get_query_command(cls) -> str:
-		return cls.query[0]
-
-	@classmethod
-	def get_query_pktid(cls) -> str:
-		return cls.query[1]
-
-	@classmethod
-	def get_query_info(cls) -> str:
-		return cls.query[2]
+	def get_sent_packet(cls) -> str:
+		return cls.sent_packet
 	# -----------------------------------------------------------------------------

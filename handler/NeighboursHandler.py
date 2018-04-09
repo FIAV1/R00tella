@@ -128,6 +128,9 @@ class NeighboursHandler(HandlerInterface):
 			sd.close()
 
 			# packet management
+			if pktid == AppData.get_sent_packet():
+				return
+
 			if not AppData.exist_in_received_packets(pktid):
 				AppData.add_received_packet(pktid, ip_peer, port_peer)
 				t = Timer(300, function=self.__delete_packet, args=(pktid,))
@@ -163,6 +166,9 @@ class NeighboursHandler(HandlerInterface):
 			sd.close()
 
 			# packet management
+			if pktid == AppData.get_sent_packet():
+				return
+
 			if not AppData.exist_in_received_packets(pktid):
 				AppData.add_received_packet(pktid, ip_peer, port_peer)
 				t = Timer(300, function=self.__delete_packet, args=(pktid,))

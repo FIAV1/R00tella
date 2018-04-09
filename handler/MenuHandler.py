@@ -94,7 +94,7 @@ class MenuHandler:
 				break
 
 			packet = choice + pktid + ip + str(port).zfill(5) + ttl + search.ljust(20)
-			AppData.add_query(choice, pktid, '')
+			AppData.set_sent_packet(pktid)
 
 			# avvio il server di ricezione delle response, lo faccio prima del broadcast
 			# per evitare che i primi client che rispondono non riescano a connettersi
@@ -103,7 +103,7 @@ class MenuHandler:
 			server.start()
 
 			shell_colors.print_blue('\n! Press enter to continue !\n')
-			spinner = SpinnerThread('Searching files', 'Results:')
+			spinner = SpinnerThread('Searching files', 'Research done!')
 			spinner.start()
 
 			timer = Timer(300, lambda: (spinner.stop(), server.stop()))
@@ -131,8 +131,8 @@ class MenuHandler:
 				shell_colors.print_red('\nNo matching results.\n')
 				return
 
-			for count, file in enumerate(files, start=1):
-				print(f'{count}]', file)
+			# for count, file in enumerate(files, start=1):
+			# 	print(f'{count}]', file)
 
 			while True:
 				index = input('\nPlease select a file to download: ')
@@ -171,7 +171,7 @@ class MenuHandler:
 			ttl = '03'
 
 			packet = choice + pktid + ip + str(port).zfill(5) + ttl
-			AppData.add_query(choice, pktid, '')
+			AppData.set_sent_packet(pktid)
 
 			old_neighbours_len = len(AppData.get_neighbours())
 
@@ -182,7 +182,7 @@ class MenuHandler:
 			server.start()
 
 			shell_colors.print_blue('\n! Press enter to continue !\n')
-			spinner = SpinnerThread('Searching peers', 'Results:')
+			spinner = SpinnerThread('Searching peers', 'Research done!')
 			spinner.start()
 
 			timer = Timer(300, lambda: (spinner.stop(), server.stop()))

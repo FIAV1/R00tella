@@ -122,55 +122,40 @@ def prompt_neighbours_request() -> None:
 
 	:return: None
 	"""
-	shell_colors.print_blue(
-		'\nThis process will allow you to add new peers to your list of known peers (enter "q" to exit).\n')
 
 	while True:
-		while True:
-			ip4 = input('Insert a known peer (IPv4): ')
-			if ip4 == 'q':
-				break
-
-			try:
-				ipaddress.IPv4Address(ip4)
-			except ipaddress.AddressValueError:
-				shell_colors.print_red(f'{ip4} is not a valid IPv4 address, please retry.')
-				continue
-			break
-
+		ip4 = input('Insert a known peer (IPv4): ')
 		if ip4 == 'q':
 			break
 
-		while True:
-			ip6 = input('Insert a known peer (IPv6): ')
-			try:
-				ipaddress.IPv6Address(ip6)
-			except ipaddress.AddressValueError:
-				shell_colors.print_red(f'{ip6} is not a valid IPv6 address, please retry.')
+		try:
+			ipaddress.IPv4Address(ip4)
+		except ipaddress.AddressValueError:
+			shell_colors.print_red(f'{ip4} is not a valid IPv4 address, please retry.')
+			continue
+		break
+
+	while True:
+		ip6 = input('Insert a known peer (IPv6): ')
+		try:
+			ipaddress.IPv6Address(ip6)
+		except ipaddress.AddressValueError:
+			shell_colors.print_red(f'{ip6} is not a valid IPv6 address, please retry.')
+			continue
+		break
+
+	while True:
+		port = input('Insert a known peer (port): ')
+		try:
+			port = int(port)
+			if not 1024 < port < 65535:
+				shell_colors.print_red(f'{port} must be in range 1025 - 65535')
 				continue
-			break
+		except ValueError:
+			shell_colors.print_red(f'{port} is not a valid port number, please retry.')
+			continue
+		break
 
-		if ip6 == 'q':
-			break
+	AppData.add_neighbour(ip4, ip6, port)
 
-		while True:
-			port = input('Insert a known peer (port): ')
-			try:
-				if port == 'q':
-					break
-
-				port = int(port)
-				if not 1024 < port < 65535:
-					shell_colors.print_red(f'{port} must be in range 1025 - 65535')
-					continue
-			except ValueError:
-				shell_colors.print_red(f'{port} is not a valid port number, please retry.')
-				continue
-			break
-
-		if port == 'q':
-			break
-
-		AppData.add_neighbour(ip4, ip6, port)
-
-		shell_colors.print_green(f'\nSuccessfully added the new peer: {ip4}|{ip6} [{port}]\n')
+	shell_colors.print_green(f'\nSuccessfully added the new peer: {ip4}|{ip6} [{port}]\n')

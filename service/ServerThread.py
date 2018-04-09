@@ -8,9 +8,10 @@ from threading import Timer
 from utils import shell_colors
 
 
-class Server:
+class ServerThread(Thread):
 
 	def __init__(self, port: int, handler: HandlerInterface):
+		super(ServerThread, self).__init__()
 		self.ss = None
 		self.port = port
 		self.BUFF_SIZE = 200
@@ -52,7 +53,7 @@ class Server:
 			shell_colors.print_red(f'\nCan\'t handle the socket: {OSError}\n')
 			sys.exit(socket.error)
 
-	def __close_socket(self) -> None:
+	def stop(self) -> None:
 		""" Close the passive socket ending the accept
 
 		:return: None
@@ -63,31 +64,23 @@ class Server:
 		except OSError:
 			self.ss.close()
 
-	def run(self, temporary: bool) -> None:
+	def run(self) -> None:
 		""" Execute the server that listens for incoming requests/repsonses
 
-		:param temporary: indicate wether the server is temporary or not
 		:return: None
 		"""
 		threads = []
 		self.__create_socket()
-
-		if temporary:
-			timer = Timer(20, self.__close_socket)
-			timer.start()
 
 		while True:
 			# Put the passive socket on hold for connection requests
 			try:
 				(sd, clientaddr) = self.ss.accept()
 
-				if not temporary or (temporary and timer.is_alive()):
-					t = Thread(target=self.child, args=(sd,))
-					t.daemon = True
-					t.start()
-					threads.append(t)
-				else:
-					break
+				t = Thread(target=self.child, args=(sd,))
+				t.daemon = True
+				t.start()
+				threads.append(t)
 
 			except OSError:
 				if threads is not None:

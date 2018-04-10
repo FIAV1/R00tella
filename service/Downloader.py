@@ -71,7 +71,7 @@ class Downloader:
 		shell_colors.print_blue(f'\n#chunk: {total_chunks}')
 
 		try:
-			fd = os.open('shared/' + self.file_name, os.O_WRONLY | os.O_CREAT)
+			f_obj = open('shared/' + self.file_name, 'wb')
 		except OSError as e:
 			shell_colors.print_red(f'\nSomething went wrong: {e}\n')
 			raise e
@@ -88,7 +88,7 @@ class Downloader:
 			# if not all the expected bytes has been received
 			while len(data) < chunk_size:
 				data += sock.recv(1)
-			os.write(fd, data)
+			f_obj.write(data)
 			progress_bar.print_progress_bar(i + 1, total_chunks, prefix='Downloading:', suffix='Complete', length=50)
 
-		os.close(fd)
+		f_obj.close()

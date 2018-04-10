@@ -11,11 +11,16 @@ from service.AppData import AppData
 
 if __name__ == '__main__':
 
-	shell.print_orange(' ____   ___   ___  _       _ _       ')
-	shell.print_red('|  _ \ / _ \ / _ \| |_ ___| | | __ _ ')
-	shell.print_yellow('| |_) | | | | | | | __/ _ \ | |/ _` |')
-	shell.print_green('|  _ <| |_| | |_| | ||  __/ | | (_| |')
-	shell.print_blue('|_| \__\\___/ \___/ \__\___|_|_|\__,_|')
+	shell.print_red(' ____   ___   ___  _   ', end='')
+	shell.print_yellow('    _ _       ')
+	shell.print_red('|  _ \ / _ \ / _ \| |_ ', end='')
+	shell.print_yellow('___| | | __ _ ')
+	shell.print_red('| |_) | | | | | | | __/', end='')
+	shell.print_yellow(' _ \ | |/ _` |')
+	shell.print_red('|  _ <| |_| | |_| | |', end='')
+	shell.print_yellow('|  __/ | | (_| |')
+	shell.print_red('|_| \__\\___/ \___/ \__', end='')
+	shell.print_yellow('\___|_|_|\__,_|')
 
 	if not os.path.exists('shared'):
 		os.mkdir('shared')

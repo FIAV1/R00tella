@@ -2,15 +2,35 @@
 
 :books: Reti Peer To Peer - Università degli Studi di Ferrara :books:
 
-A peer-to-peer server based on Gnutella's approach
+A peer-to-peer server based on Gnutella's approach:
+
+> ### Query flooding
+> **Fully distributed**
+>   * No central server
+>   * Peers contact a few nodes to become neighbours
+>   * Search: peers ask neighbors, who ask their neighbors
+>   * Peers get files directly from other nodes
+>
+> ### Advantages
+>   * Fully decentralized
+>   * Search cost distributed
+>   * Processing per node permits powerful search semantics
+>
+> ### Disadvantages
+>   * Search scope may be quite large
+>   * Search time may be quite long
+>   * High overhead, and nodes come and go often
 
 ## Usage
 ```shell
 python3 R00tella.py
 ```
+
+Files to be shared must be put in the 'shared' folder. Files must be present at app's startup, otherwise they won't be managed.
+
 **_Note:_** Python 3.6 or above is required
 
-### Client's supported commands:
+### Peer's supported commands:
 [xxxB] = the parameter length in bytes
  
 ```shell
@@ -29,10 +49,6 @@ RETR[4B].Filemd5[32B]
 # Server response will be
 ARET[4B].\#chunk[3B].{Lenchunk_i[5B].data[LB]}(i=1..#chunk)
 ```
-
-## To-Do
-- [ ] Directory Server implementation
-- [ ] Peer implementation
 
 ## Authors :rocket:
 * [Federico Frigo](https://github.com/xBlue0)

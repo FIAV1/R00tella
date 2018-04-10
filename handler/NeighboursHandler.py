@@ -32,14 +32,16 @@ class NeighboursHandler(HandlerInterface):
 		"""
 		if random.random() <= 0.5:
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			sock.settimeout(2)
 			version = 4
 		else:
 			sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+			sock.settimeout(2)
 			version = 6
 
 		return sock, version
 
-	def __forward_packet(self, ip_sender: str, ttl: str, packet: str) -> None:
+	def __forward_packet(self, ip_sender: str, ip_source: str, ttl: str, packet: str) -> None:
 		""" Forward a packet in the net to neighbours
 
 		:param ip_sender: ip address of sender host
@@ -50,10 +52,12 @@ class NeighboursHandler(HandlerInterface):
 		new_ttl = int(ttl) - 1
 
 		if new_ttl > 0:
-			# get the recipients list without the peer who sent the packet
-			recipients = AppData.get_neighbours_recipients(ip_sender)
+			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_source)
 
-			packet = packet.replace(ttl, str(new_ttl).zfill(2))
+			# get the recipients list without the peer who sent the packet
+			recipients = AppData.get_neighbours_recipients(ip_sender, ip4_peer, ip6_peer)
+
+			packet = packet[:80] + str(new_ttl).zfill(2) + packet[82:]
 
 			for peer in recipients:
 				self.__unicast(AppData.get_peer_ip4(peer), AppData.get_peer_ip6(peer), AppData.get_peer_port(peer), packet)
@@ -150,7 +154,7 @@ class NeighboursHandler(HandlerInterface):
 				self.__unicast(ip4_peer, ip6_peer, port_peer, response)
 
 			# forwarding the packet to other peers
-			self.__forward_packet(socket_ip_sender, ttl, packet)
+			self.__forward_packet(socket_ip_sender, ip_peer, ttl, packet)
 
 		elif command == "NEAR":
 			if len(packet) != 82:
@@ -181,7 +185,7 @@ class NeighboursHandler(HandlerInterface):
 			self.__unicast(ip4_peer, ip6_peer, port_peer, response)
 
 			# forwarding the packet to other peers
-			self.__forward_packet(socket_ip_sender, ttl, packet)
+			self.__forward_packet(socket_ip_sender, ip_peer, ttl, packet)
 
 		elif command == "RETR":
 			if len(packet) != 36:
@@ -203,7 +207,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			try:
-				fd = os.open('shared/' + file_name, os.O_RDONLY)
+				f_obj = open('shared/' + file_name, 'rb')
 			except OSError as e:
 				self.log.write_red(f'Cannot open the file to upload: {e}')
 				self.log.write_blue('Sending -> ', end='')
@@ -213,9 +217,13 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			try:
-				Uploader(sd, fd, self.log).start()
+				Uploader(sd, f_obj, self.log).start()
+				self.log.write_blue(f'Sent {sd.getpeername()[0]} [{sd.getpeername()[1]}] -> ', end='')
+				self.log.write(f'{file_name}')
+				sd.close()
 			except OSError:
 				self.log.write_red('Error while sending the file.')
+				sd.close()
 				return
 
 		else:

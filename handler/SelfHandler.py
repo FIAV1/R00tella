@@ -50,10 +50,10 @@ class SelfHandler(HandlerInterface):
 			if not AppData.exist_peer_files(ip4_peer, ip6_peer, port_peer, filemd5, filename):
 				AppData.add_peer_files(ip4_peer, ip6_peer, port_peer, filemd5, filename)
 				index = AppData.peer_file_index(ip4_peer, ip6_peer, port_peer, filemd5, filename)
-				print(f'[{index}] ', end='')
+				print(f'{index +1}] ', end='')
 				shell_colors.print_blue(f'{filename} ', end='')
 				shell_colors.print_yellow(f'md5={filemd5} ', end='')
-				print('({ip4_peer}|{ip6_peer} [{port_peer}])')
+				print(f'({ip4_peer}|{ip6_peer} [{port_peer}])')
 
 		elif command == "ANEA":
 			try:
@@ -75,13 +75,15 @@ class SelfHandler(HandlerInterface):
 			port_peer = int(response[71:76])
 
 			if pktid != AppData.get_sent_packet():
-				sd.close()
+				return
+
+			if len(AppData.get_neighbours()) >= 5:
 				return
 
 			if not AppData.is_neighbour(ip4_peer, ip6_peer, port_peer):
 				AppData.add_neighbour(ip4_peer, ip6_peer, port_peer)
-				index = AppData.neighbour_index(ip4_peer, ip6_peer, port_peer)
-				print(f'{index}] New neighbour found: {ip4_peer}|{ip6_peer} [{port_peer}]')
+				shell_colors.print_green('New neighbour found: ', end='')
+				print(f'{ip4_peer}|{ip6_peer} [{port_peer}]')
 
 		else:
 			wrong_response = sd.recv(300).decode()

@@ -87,12 +87,16 @@ class AppData:
 		return cls.neighbours.index((ip4_peer, ip6_peer, port_peer))
 
 	@classmethod
-	def get_neighbours_recipients(cls, ip_sender: str) -> list:
+	def get_neighbours_recipients(cls, ip_sender: str, ip4_source: str, ip6_source: str) -> list:
 		recipients = cls.neighbours.copy()
+
 		for peer in cls.neighbours:
 			if ip_sender == peer[0] or ip_sender == peer[1]:
 				recipients.remove(peer)
-				break
+
+			elif ip4_source == peer[0] or ip6_source == peer[1]:
+				recipients.remove(peer)
+
 		return recipients
 
 	@classmethod

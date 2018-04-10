@@ -111,4 +111,3 @@ ENV/
 setup.cfg
 
 .DS_Store
-shared

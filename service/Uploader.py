@@ -2,15 +2,15 @@
 
 import socket
 import os
-import stat
-from utils import shell_colors, Logger
+import io
+from utils import Logger
 
 
 class Uploader:
 
-	def __init__(self, sd: socket.socket, fd: int, log: Logger.Logger):
+	def __init__(self, sd: socket.socket, f_obj: io.FileIO, log: Logger.Logger):
 		self.sd = sd
-		self.fd = fd
+		self.f_obj = f_obj
 		self.log = log
 
 	def start(self) -> None:
@@ -20,7 +20,7 @@ class Uploader:
 		"""
 
 		try:
-			filesize = os.fstat(self.fd)[stat.ST_SIZE]
+			filesize = os.fstat(self.f_obj.fileno()).st_size
 		except OSError as e:
 			self.log.write_red(f'Something went wrong: {e}')
 			raise e
@@ -39,9 +39,9 @@ class Uploader:
 		self.sd.send(response.encode())
 
 		for i in range(nchunk):
-			data = os.read(self.fd, 4096)
-			#print(f'Letti {len(data)} bytes da file: {data}')
+			data = self.f_obj.read(4096)
+			# print(f'Letti {len(data)} bytes da file: {data}')
 			readed_size = str(len(data)).zfill(5)
 			self.sd.send(readed_size.encode())
 			self.sd.send(data)
-		os.close(self.fd)
+		self.f_obj.close()

@@ -205,7 +205,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			try:
-				fd = os.open('shared/' + file_name, os.O_RDONLY)
+				f_obj = open('shared/' + file_name, 'rb')
 			except OSError as e:
 				self.log.write_red(f'Cannot open the file to upload: {e}')
 				self.log.write_blue('Sending -> ', end='')
@@ -215,7 +215,7 @@ class NeighboursHandler(HandlerInterface):
 				return
 
 			try:
-				Uploader(sd, fd, self.log).start()
+				Uploader(sd, f_obj, self.log).start()
 			except OSError:
 				self.log.write_red('Error while sending the file.')
 				return

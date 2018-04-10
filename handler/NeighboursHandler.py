@@ -39,7 +39,7 @@ class NeighboursHandler(HandlerInterface):
 
 		return sock, version
 
-	def __forward_packet(self, ip_sender: str, ttl: str, packet: str) -> None:
+	def __forward_packet(self, ip_sender: str, ip_source: str, ttl: str, packet: str) -> None:
 		""" Forward a packet in the net to neighbours
 
 		:param ip_sender: ip address of sender host
@@ -50,9 +50,7 @@ class NeighboursHandler(HandlerInterface):
 		new_ttl = int(ttl) - 1
 
 		if new_ttl > 0:
-
-			ip_peer = packet[16:71]
-			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_peer)
+			ip4_peer, ip6_peer = net_utils.get_ip_pair(ip_source)
 
 			# get the recipients list without the peer who sent the packet
 			recipients = AppData.get_neighbours_recipients(ip_sender, ip4_peer, ip6_peer)
@@ -154,7 +152,7 @@ class NeighboursHandler(HandlerInterface):
 				self.__unicast(ip4_peer, ip6_peer, port_peer, response)
 
 			# forwarding the packet to other peers
-			self.__forward_packet(socket_ip_sender, ttl, packet)
+			self.__forward_packet(socket_ip_sender, ip_peer, ttl, packet)
 
 		elif command == "NEAR":
 			if len(packet) != 82:
@@ -185,7 +183,7 @@ class NeighboursHandler(HandlerInterface):
 			self.__unicast(ip4_peer, ip6_peer, port_peer, response)
 
 			# forwarding the packet to other peers
-			self.__forward_packet(socket_ip_sender, ttl, packet)
+			self.__forward_packet(socket_ip_sender, ip_peer, ttl, packet)
 
 		elif command == "RETR":
 			if len(packet) != 36:

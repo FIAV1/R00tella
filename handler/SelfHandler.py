@@ -77,7 +77,7 @@ class SelfHandler(HandlerInterface):
 			if pktid != AppData.get_sent_packet():
 				return
 
-			if len(AppData.get_neighbours()) >= 3:
+			if len(AppData.get_neighbours()) >= 5:
 				return
 
 			if not AppData.is_neighbour(ip4_peer, ip6_peer, port_peer):

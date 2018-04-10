@@ -103,7 +103,7 @@ class MenuHandler:
 			server.start()
 
 			shell_colors.print_blue('\n! Press enter to continue !\n')
-			spinner = SpinnerThread('Searching files', 'Research done!')
+			spinner = SpinnerThread('Searching files (ENTER to continue)', 'Research done!')
 			spinner.start()
 
 			timer = Timer(300, lambda: (spinner.stop(), server.stop()))
@@ -181,8 +181,7 @@ class MenuHandler:
 			server.daemon = True
 			server.start()
 
-			shell_colors.print_blue('\n! Press enter to continue !\n')
-			spinner = SpinnerThread('Searching peers', 'Research done!')
+			spinner = SpinnerThread('Searching peers (ENTER to continue)', 'Research done!')
 			spinner.start()
 
 			timer = Timer(300, lambda: (spinner.stop(), server.stop()))

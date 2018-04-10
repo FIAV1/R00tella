@@ -94,7 +94,7 @@ class AppData:
 			if ip_sender == peer[0] or ip_sender == peer[1]:
 				recipients.remove(peer)
 
-			if ip4_source == peer[0] or ip6_source == peer[1]:
+			elif ip4_source == peer[0] or ip6_source == peer[1]:
 				recipients.remove(peer)
 
 		return recipients

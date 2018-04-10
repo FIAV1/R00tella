@@ -32,9 +32,11 @@ class NeighboursHandler(HandlerInterface):
 		"""
 		if random.random() <= 0.5:
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			sock.settimeout(2)
 			version = 4
 		else:
 			sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+			sock.settimeout(2)
 			version = 6
 
 		return sock, version
@@ -216,8 +218,12 @@ class NeighboursHandler(HandlerInterface):
 
 			try:
 				Uploader(sd, f_obj, self.log).start()
+				self.log.write_blue(f'Sent {sd.getpeername()[0]} [{sd.getpeername()[1]}] -> ', end='')
+				self.log.write(f'{file_name}')
+				sd.close()
 			except OSError:
 				self.log.write_red('Error while sending the file.')
+				sd.close()
 				return
 
 		else:

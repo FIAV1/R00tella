@@ -102,7 +102,6 @@ class MenuHandler:
 			server.daemon = True
 			server.start()
 
-			shell_colors.print_blue('\n! Press enter to continue !\n')
 			spinner = SpinnerThread('Searching files (ENTER to continue)', 'Research done!')
 			spinner.start()
 

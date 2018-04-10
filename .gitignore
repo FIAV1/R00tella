@@ -45,6 +45,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+test/
 
 # Translations
 *.mo
@@ -99,3 +100,14 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# vscode
+.vscode
+
+# pycharm
+.idea
+
+# pep8
+setup.cfg
+
+.DS_Store
